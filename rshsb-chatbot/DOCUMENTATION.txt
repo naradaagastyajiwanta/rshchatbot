@@ -1,0 +1,241 @@
+# RSH CHATBOT - DOKUMENTASI BACKEND
+
+## DESKRIPSI UMUM
+RSH Chatbot adalah aplikasi chatbot WhatsApp yang terintegrasi dengan OpenAI Assistant API untuk memberikan respons cerdas kepada pengguna dan mengekstrak insight dari percakapan. Chatbot ini menggunakan model GPT-4o dan mengelola percakapan berthread melalui OpenAI Assistant API.
+
+## ARSITEKTUR SISTEM
+Sistem terdiri dari beberapa komponen utama:
+1. **WhatsApp Connection Layer** (menggunakan Baileys)
+2. **OpenAI Integration Layer** (menggunakan axios untuk API calls)
+3. **Database Layer** (menggunakan Supabase)
+4. **Insight Extraction Module**
+
+## KOMPONEN UTAMA
+
+### 1. WhatsApp Connection (index.js)
+File ini adalah entry point utama aplikasi yang menangani koneksi WhatsApp menggunakan library Baileys. Komponen ini:
+- Menginisialisasi koneksi WhatsApp
+- Menangani autentikasi multi-file
+- Memproses pesan masuk
+- Mengirim pesan ke OpenAI Assistant
+- Mengirim respons kembali ke pengguna
+- Memproses pesan untuk ekstraksi insight
+
+### 2. OpenAI Integration (openai.js)
+File ini menangani semua interaksi dengan OpenAI Assistant API menggunakan axios. Komponen ini:
+- Mengirim pesan pengguna ke OpenAI Assistant
+- Mengelola thread ID dan validasi
+- Membuat thread baru jika thread ID tidak valid
+- Menjalankan assistant dan polling untuk completion
+- Mengambil pesan terbaru dari assistant
+- Mengekstrak insight dari pesan pengguna
+
+### 3. Database Integration (supabase.js)
+File ini menangani semua operasi database menggunakan Supabase. Komponen ini:
+- Mencatat pesan chat (incoming dan outgoing)
+- Menyimpan dan mengambil thread ID untuk setiap pengguna
+- Memperbarui profil pengguna dengan insight yang diekstrak
+- Mengambil data profil pengguna
+
+### 4. Insight Extraction (extractor.js)
+File ini menangani ekstraksi insight dari pesan pengguna. Komponen ini:
+- Mengekstrak insight seperti nama, gender, lokasi, keluhan kesehatan, dll.
+- Memfilter nilai null dan string kosong
+- Memperbarui profil pengguna dengan insight yang valid
+
+## ALUR KERJA APLIKASI
+
+1. **Koneksi WhatsApp**:
+   - Aplikasi menginisialisasi koneksi WhatsApp menggunakan Baileys
+   - Menampilkan QR code untuk autentikasi
+   - Menyimpan kredensial untuk penggunaan berikutnya
+
+2. **Pemrosesan Pesan**:
+   - Menerima pesan dari pengguna WhatsApp
+   - Memfilter pesan yang tidak relevan (grup, broadcast, dll.)
+   - Mencatat pesan masuk ke database
+
+3. **Interaksi dengan OpenAI Assistant**:
+   - Mengirim pesan pengguna ke OpenAI Assistant
+   - Mengelola thread ID untuk percakapan berkelanjutan
+   - Menunggu respons dari assistant
+   - Mencatat respons ke database
+
+4. **Ekstraksi Insight**:
+   - Mengekstrak insight dari pesan pengguna menggunakan assistant khusus
+   - Memperbarui profil pengguna dengan insight yang diekstrak
+
+5. **Respons ke Pengguna**:
+   - Mengirim respons dari OpenAI Assistant kembali ke pengguna WhatsApp
+
+## KONFIGURASI ENVIRONMENT VARIABLES
+
+Aplikasi memerlukan beberapa variabel lingkungan yang harus diatur di file `.env`:
+
+```
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+ASSISTANT_ID_CHATBOT=your_chatbot_assistant_id
+ASSISTANT_ID_INSIGHT=your_insight_assistant_id
+
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+```
+
+## STRUKTUR DATABASE
+
+### Tabel: chat_logs
+- **id**: UUID (primary key)
+- **wa_number**: Text (nomor WhatsApp pengguna)
+- **message**: Text (isi pesan)
+- **direction**: Text ('incoming' atau 'outgoing')
+- **thread_id**: Text (thread ID OpenAI)
+- **timestamp**: Timestamp
+
+### Tabel: user_profiles
+- **wa_number**: Text (primary key, nomor WhatsApp pengguna)
+- **name**: Text (nama pengguna)
+- **gender**: Text (gender pengguna)
+- **domisili**: Text (lokasi pengguna)
+- **keluhan**: Text (keluhan kesehatan)
+- **barrier**: Text (hambatan konversi)
+- **lead_status**: Text (status lead)
+- **last_updated**: Timestamp
+- **age**: Integer (usia pengguna)
+- **symptoms**: Text (gejala)
+- **medical_history**: Text (riwayat medis)
+- **urgency_level**: Text (tingkat urgensi)
+- **emotion**: Text (emosi pengguna)
+- **program_awareness**: Text (kesadaran program)
+
+## IMPLEMENTASI OPENAI ASSISTANT API
+
+Aplikasi menggunakan pendekatan axios langsung untuk memanggil OpenAI Assistant API dengan header yang diperlukan:
+
+```javascript
+const headers = {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+  'OpenAI-Beta': 'assistants=v2'
+};
+```
+
+Endpoint yang digunakan:
+- `https://api.openai.com/v1/threads` - Untuk membuat thread baru
+- `https://api.openai.com/v1/threads/{thread_id}` - Untuk mengambil thread yang ada
+- `https://api.openai.com/v1/threads/{thread_id}/messages` - Untuk mengirim dan mengambil pesan
+- `https://api.openai.com/v1/threads/{thread_id}/runs` - Untuk menjalankan assistant
+- `https://api.openai.com/v1/threads/{thread_id}/runs/{run_id}` - Untuk memeriksa status run
+
+## PENANGANAN THREAD ID
+
+Aplikasi menangani thread ID dengan cara berikut:
+1. Mencoba menggunakan thread ID yang ada jika tersedia
+2. Memvalidasi thread ID dengan mencoba mengambil thread
+3. Membuat thread baru jika thread ID tidak valid atau tidak ada
+4. Menyimpan thread ID baru ke database untuk penggunaan berikutnya
+
+## EKSTRAKSI INSIGHT
+
+Aplikasi mengekstrak insight berikut dari pesan pengguna:
+- **name**: Nama pengguna
+- **gender**: Gender pengguna
+- **domisili**: Lokasi pengguna (dipetakan dari field 'location')
+- **keluhan**: Keluhan kesehatan (dipetakan dari array 'health_complaints')
+- **barrier**: Hambatan konversi (dipetakan dari array 'conversion_barriers')
+- **lead_status**: Status lead (dipetakan dari field 'interest_level')
+- **age**: Usia pengguna
+- **symptoms**: Gejala
+- **medical_history**: Riwayat medis
+- **urgency_level**: Tingkat urgensi
+- **emotion**: Emosi pengguna
+- **program_awareness**: Kesadaran program
+
+## PENGUJIAN
+
+Aplikasi menyediakan beberapa script pengujian:
+
+### test-axios-integration.js
+Menguji integrasi axios dengan OpenAI Assistant API, termasuk:
+- Pembuatan thread
+- Pengiriman pesan
+- Penanganan thread ID yang tidak valid
+- Ekstraksi insight
+
+### test-insight-axios.js
+Menguji fungsi ekstraksi insight, termasuk:
+- Pembuatan thread baru
+- Pengiriman pesan
+- Menjalankan assistant
+- Polling untuk completion
+- Mengambil dan mem-parsing respons JSON
+
+### test-run-axios.js
+Script CLI interaktif untuk menguji percakapan chatbot, termasuk:
+- Pengecekan variabel lingkungan
+- Penanganan perintah
+- Pengelolaan thread ID
+- Alur interaksi untuk pengujian chatbot dan ekstraksi insight
+
+## MENJALANKAN APLIKASI
+
+Untuk menjalankan aplikasi:
+
+1. Pastikan semua dependensi terinstal:
+   ```
+   npm install
+   ```
+
+2. Pastikan file `.env` sudah dikonfigurasi dengan benar.
+
+3. Jalankan aplikasi:
+   ```
+   node index.js
+   ```
+
+4. Scan QR code yang muncul di terminal menggunakan aplikasi WhatsApp di ponsel.
+
+5. Setelah terhubung, kirim pesan ke nomor WhatsApp yang terhubung dengan bot.
+
+## PENANGANAN ERROR
+
+Aplikasi menangani beberapa jenis error:
+- Error koneksi WhatsApp
+- Error thread ID yang tidak valid
+- Error API OpenAI
+- Error database Supabase
+
+Semua error dicatat ke konsol dengan detail yang cukup untuk debugging.
+
+## DEPENDENSI UTAMA
+
+- **@whiskeysockets/baileys**: Library untuk koneksi WhatsApp
+- **axios**: HTTP client untuk memanggil OpenAI API
+- **dotenv**: Untuk mengelola variabel lingkungan
+- **@supabase/supabase-js**: Client Supabase untuk operasi database
+- **qrcode-terminal**: Untuk menampilkan QR code di terminal
+
+## CATATAN PENTING
+
+1. Pastikan OpenAI API key memiliki kredit yang cukup.
+2. Pastikan assistant ID yang digunakan sudah dikonfigurasi dengan benar di OpenAI.
+3. Pastikan tabel yang diperlukan sudah ada di Supabase.
+4. Jika mengalami masalah dengan autentikasi WhatsApp, coba hapus folder `auth` dan jalankan ulang aplikasi.
+
+## PENGEMBANGAN LEBIH LANJUT
+
+Beberapa ide untuk pengembangan lebih lanjut:
+1. Implementasi caching untuk mengurangi panggilan API
+2. Penanganan pesan media (gambar, audio, dll.)
+3. Analisis sentiment yang lebih mendalam
+4. Dashboard admin untuk memantau percakapan
+5. Integrasi dengan sistem CRM
+
+## KONTRIBUTOR
+
+Dikembangkan oleh Tim RSH Chatbot.
+
+## LISENSI
+
+Hak Cipta © 2025 RSH Chatbot. Semua hak dilindungi.
