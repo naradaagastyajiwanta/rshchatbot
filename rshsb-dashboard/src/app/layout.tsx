@@ -27,21 +27,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
-        <div className="flex h-screen overflow-hidden">
-          {/* improved UI: Persistent sidebar with modern styling according to requirements */}
-          <div className="w-64 bg-white border-r shadow-sm flex-shrink-0 fixed h-full z-10">
-            <div className="p-4 border-b">
-              <h2 className="text-xl font-bold text-gray-800">RSH SB</h2>
+        <div className="flex h-screen overflow-hidden bg-gray-50">
+          {/* improved UI: Modern sidebar with gradient and enhanced styling */}
+          <div className="w-64 bg-gradient-to-b from-white to-blue-50 border-r border-blue-100 shadow-lg flex-shrink-0 fixed h-full z-10">
+            <div className="p-5 border-b border-blue-100 bg-white">
+              <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">RSH SB</h2>
               <p className="text-xs text-gray-500 mt-1">Healthcare Analytics Dashboard</p>
             </div>
-            <nav className="mt-4 space-y-4">
+            <nav className="mt-6 space-y-2 px-3">
               <ul>
                 <li>
                   <a 
                     href="/dashboard" 
-                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-xl group mx-2"
+                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-white hover:shadow-md hover:text-blue-600 transition-all duration-200 rounded-xl group mx-1"
                   >
-                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                     </svg>
                     <span className="font-medium">Live Chat</span>
@@ -50,9 +50,9 @@ export default function RootLayout({
                 <li>
                   <a 
                     href="/users" 
-                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-xl group mx-2"
+                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-white hover:shadow-md hover:text-blue-600 transition-all duration-200 rounded-xl group mx-1"
                   >
-                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
                     <span className="font-medium">Users</span>
@@ -61,9 +61,9 @@ export default function RootLayout({
                 <li>
                   <a 
                     href="/analytics" 
-                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-xl group mx-2"
+                    className="flex items-center px-4 py-3 text-gray-700 hover:bg-white hover:shadow-md hover:text-blue-600 transition-all duration-200 rounded-xl group mx-1"
                   >
-                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                     <span className="font-medium">Analytics</span>
@@ -72,29 +72,29 @@ export default function RootLayout({
               </ul>
             </nav>
             
-            {/* improved UI: Footer with branding */}
-            <div className="absolute bottom-0 w-full p-4 border-t">
-              <div className="text-xs text-gray-500">
-                <p>Rumah Sehat Holistik</p>
-                <p className="mt-1 text-gray-400">Satu Bumi</p>
+            {/* improved UI: Footer with enhanced branding */}
+            <div className="absolute bottom-0 w-full p-5 border-t border-blue-100 bg-white bg-opacity-70">
+              <div className="text-xs">
+                <p className="font-medium text-blue-600">Rumah Sehat Holistik</p>
+                <p className="mt-1 text-gray-500">Satu Bumi</p>
               </div>
             </div>
           </div>
 
-          {/* improved UI: Main content area with proper spacing */}
+          {/* improved UI: Main content area with enhanced styling */}
           <div className="flex-1 overflow-auto ml-64">
-            {/* improved UI: Modern header with shadow */}
-            <header className="bg-white border-b shadow-sm p-4 sticky top-0 z-10">
+            {/* improved UI: Modern header with enhanced shadow and styling */}
+            <header className="bg-white border-b border-blue-100 shadow-md p-5 sticky top-0 z-10">
               <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold text-gray-800">Rumah Sehat Holistik</h1>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm bg-blue-50 px-3 py-1 rounded-full text-blue-600 font-medium">
                   Admin Dashboard
                 </div>
               </div>
             </header>
 
-            {/* improved UI: Page content with proper padding and spacing */}
-            <main className="p-4 space-y-4">
+            {/* improved UI: Page content with enhanced padding and spacing */}
+            <main className="p-5 space-y-5 max-w-7xl mx-auto">
               {children}
             </main>
           </div>

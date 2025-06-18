@@ -222,26 +222,26 @@ export default function AnalyticsCharts() {
   }
 
   return (
-    // improved UI: Modern analytics layout with grid
+    // improved UI: Modern analytics layout with enhanced visuals
     <div className="space-y-6">
-      {/* improved UI: Analytics overview header */}
-      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800">Dashboard Analytics</h2>
-        <p className="text-gray-500 mt-1">Real-time metrics and insights for Rumah Sehat Holistik</p>
+      {/* improved UI: Analytics overview header with gradient */}
+      <div className="bg-gradient-to-r from-white to-blue-50 p-6 rounded-xl shadow-lg border border-blue-100">
+        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">Dashboard Analytics</h2>
+        <p className="text-gray-600 mt-1">Real-time metrics and insights for Rumah Sehat Holistik</p>
       </div>
       
       {/* improved UI: Grid layout for charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Chat Count Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Daily Chat Volume</h3>
-            <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded-full">
+            <h3 className="text-lg font-bold text-blue-700">Daily Chat Volume</h3>
+            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
               Last 7 days
             </span>
           </div>
-          {/* improved UI: Small title for chart */}
-          <p className="text-sm font-medium text-gray-500 mb-3">Message volume trends over time</p>
+          {/* improved UI: Small title for chart with enhanced styling */}
+          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-blue-400 pl-2">Message volume trends over time</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -282,15 +282,15 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Lead Status Distribution Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Lead Status Distribution</h3>
-            <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded-full">
+            <h3 className="text-lg font-bold text-blue-700">Lead Status Distribution</h3>
+            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
               {analyticsData.leadStatusDistribution.reduce((sum, item) => sum + item.value, 0)} users
             </span>
           </div>
-          {/* improved UI: Small title for chart */}
-          <p className="text-sm font-medium text-gray-500 mb-3">Breakdown of user lead qualification status</p>
+          {/* improved UI: Small title for chart with enhanced styling */}
+          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-blue-400 pl-2">Breakdown of user lead qualification status</p>
           <div className="h-80 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -330,15 +330,15 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Top 5 Keluhan Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Top 5 Keluhan</h3>
-            <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded-full">
+            <h3 className="text-lg font-bold text-blue-700">Top 5 Keluhan</h3>
+            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
               Most common complaints
             </span>
           </div>
-          {/* improved UI: Small title for chart */}
-          <p className="text-sm font-medium text-gray-500 mb-3">Most frequently reported health concerns</p>
+          {/* improved UI: Small title for chart with enhanced styling */}
+          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-blue-400 pl-2">Most frequently reported health concerns</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -376,15 +376,15 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Top 5 Barrier Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Top 5 Barrier</h3>
-            <span className="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded-full">
+            <h3 className="text-lg font-bold text-blue-700">Top 5 Barrier</h3>
+            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
               Common obstacles
             </span>
           </div>
-          {/* improved UI: Small title for chart */}
-          <p className="text-sm font-medium text-gray-500 mb-3">Key obstacles preventing users from seeking care</p>
+          {/* improved UI: Small title for chart with enhanced styling */}
+          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-blue-400 pl-2">Key obstacles preventing users from seeking care</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
