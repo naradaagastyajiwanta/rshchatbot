@@ -3,7 +3,7 @@
  * This module handles the extraction of user insights from conversations
  */
 
-const { extractInsight } = require('./openai');
+const { extractInsight } = require('./openai'); // Using updated openai.js with axios implementation
 const { updateUserProfile } = require('./supabase');
 
 /**
@@ -21,9 +21,9 @@ async function processMessageForInsights(message, waNumber) {
     
     // If we got any insights, update the user profile
     if (insights && !insights.error) {
-      // Filter out null values to avoid overwriting existing data
+      // Filter out null and empty string values to avoid overwriting existing data
       const filteredInsights = Object.fromEntries(
-        Object.entries(insights).filter(([_, value]) => value !== null)
+        Object.entries(insights).filter(([_, value]) => value !== null && value !== '')
       );
       
       // Only update if we have any non-null insights

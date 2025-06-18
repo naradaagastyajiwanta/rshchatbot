@@ -8,9 +8,10 @@ const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = requi
 const { Boom } = require('@hapi/boom');
 const fs = require('fs');
 const path = require('path');
+const qrcode = require('qrcode-terminal'); // Tambahkan modul qrcode-terminal
 
 // Import our modules
-const { sendToChatbot } = require('./openai');
+const { sendToChatbot } = require('./openai'); // Using updated openai.js with axios implementation
 const { logChat, getThreadId } = require('./supabase');
 const { processMessageForInsights } = require('./extractor');
 
@@ -32,9 +33,16 @@ async function connectToWhatsApp() {
     defaultQueryTimeoutMs: 60000, // 60 seconds timeout
   });
   
-  // Handle connection updates
+  // Handle QR code generation
   sock.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect } = update;
+    const { connection, lastDisconnect, qr } = update;
+    
+    // If QR code is received, display it in terminal
+    if (qr) {
+      console.log('\n==== Scan QR Code to connect to WhatsApp ====');
+      qrcode.generate(qr, { small: true });
+      console.log('\nQR Code will expire in 20 seconds. Scan it quickly!');
+    }
     
     if (connection === 'close') {
       const shouldReconnect = 

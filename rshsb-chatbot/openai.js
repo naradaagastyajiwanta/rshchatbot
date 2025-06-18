@@ -257,14 +257,29 @@ async function extractInsight(message, threadId = null) {
     try {
       // Try to parse the response as JSON
       const insights = JSON.parse(responseContent);
-      return {
+      
+      // Create a base object with our required fields
+      const baseInsights = {
         name: insights.name || null,
         gender: insights.gender || null,
-        domisili: insights.domisili || null,
-        keluhan: insights.keluhan || null,
-        barrier: insights.barrier || null,
-        lead_status: insights.lead_status || null
+        domisili: insights.location || null,
+        keluhan: Array.isArray(insights.health_complaints) ? insights.health_complaints.join(', ') : null,
+        barrier: Array.isArray(insights.conversion_barriers) ? insights.conversion_barriers.join(', ') : null,
+        lead_status: insights.interest_level || null
       };
+      
+      // Add all other fields from the OpenAI response
+      const additionalFields = {
+        age: insights.age || null,
+        symptoms: Array.isArray(insights.symptoms) ? insights.symptoms.join(', ') : null,
+        medical_history: insights.medical_history || null,
+        urgency_level: insights.urgency_level || null,
+        emotion: insights.emotion || null,
+        program_awareness: insights.program_awareness || null
+      };
+      
+      // Combine base insights with additional fields
+      return { ...baseInsights, ...additionalFields };
     } catch (parseError) {
       console.error('Error parsing insight JSON:', parseError);
       // Return empty insights if parsing fails
@@ -274,7 +289,13 @@ async function extractInsight(message, threadId = null) {
         domisili: null,
         keluhan: null,
         barrier: null,
-        lead_status: null
+        lead_status: null,
+        age: null,
+        symptoms: null,
+        medical_history: null,
+        urgency_level: null,
+        emotion: null,
+        program_awareness: null
       };
     }
   } catch (error) {
@@ -286,6 +307,12 @@ async function extractInsight(message, threadId = null) {
       keluhan: null,
       barrier: null,
       lead_status: null,
+      age: null,
+      symptoms: null,
+      medical_history: null,
+      urgency_level: null,
+      emotion: null,
+      program_awareness: null,
       error: error.message
     };
   }
