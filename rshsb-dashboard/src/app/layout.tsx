@@ -28,39 +28,73 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
         <div className="flex h-screen overflow-hidden">
-          {/* Sidebar placeholder */}
-          <div className="w-64 bg-white border-r border-gray-200 hidden md:block">
-            <div className="p-6">
-              <h2 className="text-lg font-semibold text-gray-800">RSH SB Dashboard</h2>
+          {/* Improved UI: Persistent sidebar with modern styling */}
+          <div className="w-64 bg-white border-r shadow-sm flex-shrink-0 fixed h-full z-10">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-bold text-gray-800">RSH SB</h2>
+              <p className="text-xs text-gray-500 mt-1">Healthcare Analytics Dashboard</p>
             </div>
-            <nav className="mt-6">
+            <nav className="mt-6 space-y-1">
               <ul>
-                <li className="px-6 py-3 hover:bg-gray-100">
-                  <a href="/dashboard" className="flex items-center text-gray-700 hover:text-gray-900">
-                    <span>Dashboard</span>
+                <li>
+                  <a 
+                    href="/dashboard" 
+                    className="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-r-xl group"
+                  >
+                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                    <span className="font-medium">Live Chat</span>
                   </a>
                 </li>
-                <li className="px-6 py-3 hover:bg-gray-100">
-                  <a href="/users" className="flex items-center text-gray-700 hover:text-gray-900">
-                    <span>Users</span>
+                <li>
+                  <a 
+                    href="/users" 
+                    className="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-r-xl group"
+                  >
+                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <span className="font-medium">Users</span>
                   </a>
                 </li>
-                <li className="px-6 py-3 hover:bg-gray-100">
-                  <a href="/analytics" className="flex items-center text-gray-700 hover:text-gray-900">
-                    <span>Analytics</span>
+                <li>
+                  <a 
+                    href="/analytics" 
+                    className="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-r-xl group"
+                  >
+                    <svg className="w-5 h-5 mr-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span className="font-medium">Analytics</span>
                   </a>
                 </li>
               </ul>
             </nav>
+            
+            {/* Improved UI: Footer with branding */}
+            <div className="absolute bottom-0 w-full p-6 border-t">
+              <div className="text-xs text-gray-500">
+                <p>Rumah Sehat Holistik</p>
+                <p className="mt-1 text-gray-400">Satu Bumi</p>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col flex-1 overflow-hidden">
-            <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
-              <h1 className="text-xl font-semibold text-gray-800">RSH SB Dashboard</h1>
-              <div className="flex items-center">
-                <span className="text-sm text-gray-600">Rumah Sehat Holistik Satu Bumi</span>
+
+          {/* Improved UI: Main content area with proper spacing */}
+          <div className="flex-1 overflow-auto ml-64">
+            {/* Improved UI: Modern header with shadow */}
+            <header className="bg-white border-b shadow-sm p-4 sticky top-0 z-10">
+              <div className="flex justify-between items-center">
+                <h1 className="text-xl font-bold text-gray-800">Rumah Sehat Holistik</h1>
+                <div className="text-sm text-gray-500">
+                  Admin Dashboard
+                </div>
               </div>
             </header>
-            <main className="flex-1 overflow-y-auto p-4">
+
+            {/* Improved UI: Page content with proper padding and spacing */}
+            <main className="p-6 space-y-6">
               {children}
             </main>
           </div>

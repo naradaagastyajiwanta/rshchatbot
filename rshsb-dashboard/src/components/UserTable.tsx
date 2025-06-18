@@ -151,29 +151,62 @@ export default function UserTable() {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-6">Loading user profiles...</div>;
+    return (
+      // improved UI: Better loading state
+      <div className="bg-white rounded-xl shadow p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <p className="text-gray-500 font-medium">Loading user profiles...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 p-6">{error}</div>;
+    return (
+      // improved UI: Better error state
+      <div className="bg-red-50 border border-red-200 rounded-xl shadow p-6">
+        <div className="flex items-center text-red-600 mb-2">
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path>
+          </svg>
+          <span className="font-medium">Error Loading User Data</span>
+        </div>
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">User Profiles</h2>
+    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+      {/* improved UI: Modern header with stats */}
+      <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-gray-800">User Profiles</h2>
+          <p className="text-sm text-gray-500 mt-1">{filteredUsers.length} users found</p>
+        </div>
+        <div className="text-sm text-gray-500">
+          Last updated: {new Date().toLocaleDateString()}
+        </div>
       </div>
       
-      {/* Filters */}
-      <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 border-b border-gray-200">
+      {/* improved UI: Modern filters with icons and better styling */}
+      <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 bg-gray-50 border-b">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Keluhan</label>
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            Keluhan
+          </label>
           <select
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             value={filters.keluhan}
             onChange={(e) => handleFilterChange('keluhan', e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">All Keluhan</option>
             {filterOptions.keluhan.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
@@ -181,13 +214,18 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Barrier</label>
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Barrier
+          </label>
           <select
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             value={filters.barrier}
             onChange={(e) => handleFilterChange('barrier', e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">All Barriers</option>
             {filterOptions.barrier.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
@@ -195,13 +233,19 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Domisili</label>
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Domisili
+          </label>
           <select
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             value={filters.domisili}
             onChange={(e) => handleFilterChange('domisili', e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">All Locations</option>
             {filterOptions.domisili.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
@@ -209,13 +253,18 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Lead Status</label>
+          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+            <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            Lead Status
+          </label>
           <select
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             value={filters.lead_status}
             onChange={(e) => handleFilterChange('lead_status', e.target.value)}
           >
-            <option value="">All</option>
+            <option value="">All Statuses</option>
             {filterOptions.lead_status.map((option) => (
               <option key={option} value={option}>{option}</option>
             ))}
@@ -223,27 +272,27 @@ export default function UserTable() {
         </div>
       </div>
       
-      {/* Table */}
+      {/* improved UI: Modern table with zebra-striping */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <thead>
+            <tr className="bg-gray-50">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 User
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Keluhan
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Barrier
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Domisili
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Lead Status
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Last Updated
               </th>
             </tr>
@@ -251,41 +300,126 @@ export default function UserTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No users found matching the selected filters
+                <td colSpan={6} className="px-6 py-8 text-center">
+                  <div className="flex flex-col items-center">
+                    <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <p className="text-gray-500 font-medium">No users found matching the selected filters</p>
+                    <p className="text-gray-400 text-sm mt-1">Try adjusting your filter criteria</p>
+                  </div>
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user) => (
-                <tr key={user.wa_number} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href={`/user/${user.wa_number}`} className="text-blue-600 hover:text-blue-900">
-                      <div className="font-medium">{user.name || 'Unknown'}</div>
-                      <div className="text-sm text-gray-500">{user.wa_number}</div>
+              filteredUsers.map((user, index) => (
+                <tr 
+                  key={user.wa_number} 
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150`}
+                >
+                  <td className="px-6 py-4">
+                    <Link 
+                      href={`/user/${user.wa_number}`} 
+                      className="group flex flex-col"
+                    >
+                      <div className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
+                        {user.name || 'Unknown'}
+                      </div>
+                      <div className="text-sm text-gray-500 group-hover:text-blue-500 transition-colors">
+                        {user.wa_number}
+                      </div>
                     </Link>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.keluhan || '-'}
+                  <td className="px-6 py-4">
+                    {user.keluhan ? (
+                      <div className="text-sm text-gray-700">{user.keluhan}</div>
+                    ) : (
+                      <div className="text-sm text-gray-400 italic">Not specified</div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.barrier || '-'}
+                  <td className="px-6 py-4">
+                    {user.barrier ? (
+                      <div className="text-sm text-gray-700">{user.barrier}</div>
+                    ) : (
+                      <div className="text-sm text-gray-400 italic">Not specified</div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.domisili || '-'}
+                  <td className="px-6 py-4">
+                    {user.domisili ? (
+                      <div className="flex items-center text-sm text-gray-700">
+                        <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        {user.domisili}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400 italic">Not specified</div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getLeadStatusColor(user.lead_status)}`}>
-                      {user.lead_status}
-                    </span>
+                  <td className="px-6 py-4">
+                    {/* improved UI: Better lead status badges */}
+                    {user.lead_status === 'Hot' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
+                        Hot
+                      </span>
+                    )}
+                    {user.lead_status === 'Warm' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                        <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1.5"></span>
+                        Warm
+                      </span>
+                    )}
+                    {user.lead_status === 'Cold' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>
+                        Cold
+                      </span>
+                    )}
+                    {!user.lead_status && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                        Unknown
+                      </span>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.last_updated ? new Date(user.last_updated).toLocaleString() : '-'}
+                  <td className="px-6 py-4">
+                    {user.last_updated ? (
+                      <div className="flex items-center text-sm text-gray-500">
+                        <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {new Date(user.last_updated).toLocaleDateString()} at {new Date(user.last_updated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400 italic">No data</div>
+                    )}
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+      </div>
+      
+      {/* improved UI: Pagination placeholder */}
+      <div className="bg-white px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+        <div className="text-sm text-gray-500">
+          Showing <span className="font-medium">{filteredUsers.length}</span> users
+        </div>
+        <div className="flex space-x-2">
+          <button 
+            disabled 
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <button 
+            disabled 
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

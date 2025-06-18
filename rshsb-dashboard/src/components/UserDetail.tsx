@@ -91,15 +91,46 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-6">Loading user profile...</div>;
+    return (
+      // improved UI: Better loading state
+      <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <p className="text-gray-500 font-medium">Loading user profile...</p>
+            <p className="text-xs text-gray-400 mt-1">This may take a moment</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 p-6">{error}</div>;
+    return (
+      // improved UI: Better error state
+      <div className="bg-red-50 border border-red-200 rounded-xl shadow-md p-6">
+        <div className="flex items-center text-red-600 mb-2">
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"></path>
+          </svg>
+          <span className="font-medium">Error Loading User Profile</span>
+        </div>
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
   }
 
   if (!user) {
-    return <div className="p-6">User profile not found</div>;
+    return (
+      // improved UI: Better not found state
+      <div className="bg-gray-50 border border-gray-200 rounded-xl shadow-md p-6 text-center">
+        <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+        </svg>
+        <h3 className="text-lg font-medium text-gray-900 mb-1">User Profile Not Found</h3>
+        <p className="text-gray-500">The requested user profile could not be found</p>
+      </div>
+    );
   }
 
   return (

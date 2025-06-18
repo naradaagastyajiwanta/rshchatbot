@@ -1,0 +1,276 @@
+# RSHSB DASHBOARD DOCUMENTATION
+===============================
+
+## OVERVIEW
+-----------
+The RSHSB Dashboard is an administrative interface designed to monitor and analyze the performance of the Rumah Sehat Holistik Satu Bumi (RSH) WhatsApp chatbot. It provides real-time chat monitoring, user profile management, and analytics visualization to help administrators track and improve the chatbot's effectiveness.
+
+## TECHNICAL SPECIFICATIONS
+--------------------------
+- Framework: Next.js 15.3.3 with App Router
+- Language: TypeScript
+- Styling: TailwindCSS
+- Database: Supabase
+- Real-time Updates: Supabase Realtime
+- Charts: Recharts
+- Deployment: Can be deployed on Vercel or other Next.js-compatible platforms
+
+## SYSTEM REQUIREMENTS
+---------------------
+- Node.js 18.x or higher
+- npm or yarn package manager
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Internet connection for Supabase database access
+
+## INSTALLATION
+--------------
+1. Clone the repository
+   ```
+   git clone <repository-url>
+   cd rshsb-dashboard
+   ```
+
+2. Install dependencies
+   ```
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Create a `.env.local` file in the project root with the following content:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://kfrmnlscvejptimbehgb.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtmcm1ubHNjdmVqcHRpbWJlaGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMzMyMjAsImV4cCI6MjA2NTgwOTIyMH0.s-3sW0OPAv28VRAiA_gCqeu8uxXP2yDeMyeDyfB7Q0I
+   ```
+
+4. Start the development server
+   ```
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Access the dashboard at http://localhost:3000
+
+## PROJECT STRUCTURE
+-------------------
+```
+src/
+├── app/                    # App Router pages
+│   ├── dashboard/          # Live chat monitoring page
+│   ├── users/              # User profiles listing page
+│   ├── analytics/          # Data visualization page
+│   ├── user/[wa_number]/   # Individual user detail page
+│   └── layout.tsx          # Root layout with sidebar and header
+├── components/             # Reusable components
+│   ├── ChatViewer.tsx      # Chat message display component
+│   ├── UserTable.tsx       # User profiles table with filters
+│   ├── AnalyticsCharts.tsx # Charts and data visualization
+│   └── UserDetail.tsx      # User profile detail component
+└── lib/
+    └── supabaseClient.ts   # Supabase client configuration
+```
+
+## DATABASE STRUCTURE
+--------------------
+The dashboard connects to a Supabase database with the following tables:
+
+### `chat_logs`
+- `id`: UUID - Unique identifier for each chat message
+- `wa_number`: Text - WhatsApp number of the user
+- `message`: Text - Content of the message
+- `direction`: Text - Direction of message ('incoming' | 'outgoing')
+- `timestamp`: Timestamp - When the message was sent/received
+- `thread_id`: Text - Identifier for grouping related messages
+
+### `user_profiles`
+- `wa_number`: Text (primary key) - WhatsApp number of the user
+- `name`: Text - User's name
+- `gender`: Text - User's gender
+- `domisili`: Text - User's location/domicile
+- `keluhan`: Text - User's complaint/issue
+- `barrier`: Text - Barrier to conversion
+- `lead_status`: Text - Lead qualification status ('Cold' | 'Warm' | 'Hot')
+- `last_updated`: Timestamp - When the profile was last updated
+- `age`: Integer - User's age
+- `symptoms`: Text - User's symptoms
+- `medical_history`: Text - User's medical history
+- `urgency_level`: Text - Urgency of the user's issue
+- `emotion`: Text - User's emotional state
+- `program_awareness`: Text - User's awareness of RSH programs
+
+## FEATURES
+----------
+
+### 1. Dashboard Page (/dashboard)
+The Dashboard page displays a real-time chat viewer that shows conversations between users and the chatbot. Key features include:
+- Real-time message updates
+- Visual distinction between incoming and outgoing messages
+- Timestamp display for each message
+- Automatic scrolling to latest messages
+- WhatsApp number identification
+
+### 2. Users Page (/users)
+The Users page provides a comprehensive table of all user profiles with filtering capabilities. Key features include:
+- Sortable and filterable table of user profiles
+- Filters for keluhan (complaint), barrier, domisili (location), and lead_status
+- Color-coded lead status indicators (Hot: green, Warm: yellow, Cold: red)
+- Click-through to detailed user profile
+- Last updated timestamp
+
+### 3. Analytics Page (/analytics)
+The Analytics page visualizes key metrics using interactive charts. Key features include:
+- Daily chat volume chart (last 7 days)
+- Top 5 keluhan (complaints) bar chart
+- Top 5 barrier bar chart
+- Lead status distribution pie chart
+- Real-time data updates
+
+### 4. User Detail Page (/user/[wa_number])
+The User Detail page shows comprehensive information about a specific user. Key features include:
+- Complete user profile information
+- Chat history specific to the user
+- Real-time updates to profile and chat history
+- Back navigation to user list
+
+## COMPONENT DETAILS
+-------------------
+
+### ChatViewer Component
+- Subscribes to the `chat_logs` table in Supabase
+- Displays messages in a chat-like interface
+- Differentiates between incoming and outgoing messages
+- Shows timestamps for each message
+- Can be filtered by WhatsApp number
+
+### UserTable Component
+- Fetches and displays user profiles from the `user_profiles` table
+- Provides filtering by multiple criteria
+- Implements color-coding for lead status
+- Links to detailed user profiles
+- Sorts by last updated timestamp
+
+### AnalyticsCharts Component
+- Processes data for visualization
+- Creates multiple chart types (line, bar, pie)
+- Updates in real-time as data changes
+- Provides insights on chat volume, common complaints, barriers, and lead status
+
+### UserDetail Component
+- Fetches specific user profile by WhatsApp number
+- Displays comprehensive user information
+- Shows chat history specific to the user
+- Updates in real-time
+
+## NAVIGATION
+------------
+The dashboard uses a sidebar navigation system with the following structure:
+- Dashboard - Live chat monitoring
+- Users - User profile management
+- Analytics - Data visualization and insights
+
+The root path (/) automatically redirects to the dashboard page.
+
+## REAL-TIME FUNCTIONALITY
+-------------------------
+The dashboard uses Supabase Realtime to provide live updates without requiring page refreshes:
+- Chat messages appear instantly when sent/received
+- User profiles update in real-time when changed
+- Analytics charts refresh automatically when data changes
+
+## STYLING
+---------
+The dashboard uses TailwindCSS for styling with the following design principles:
+- Clean, professional interface
+- Responsive design that works on desktop and mobile
+- Consistent color scheme
+- Clear typography using Geist font
+- Visual hierarchy to emphasize important information
+
+## ENVIRONMENT VARIABLES
+----------------------
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
+
+## DEPLOYMENT
+-----------
+The dashboard can be deployed to any platform that supports Next.js applications:
+
+1. Build the production version:
+   ```
+   npm run build
+   # or
+   yarn build
+   ```
+
+2. Start the production server:
+   ```
+   npm start
+   # or
+   yarn start
+   ```
+
+3. For Vercel deployment:
+   - Connect your GitHub repository to Vercel
+   - Configure environment variables in the Vercel dashboard
+   - Deploy automatically from the main branch
+
+## TROUBLESHOOTING
+----------------
+Common issues and solutions:
+
+1. **No data appearing in dashboard**
+   - Check Supabase connection credentials
+   - Verify that tables exist and have the correct structure
+   - Check browser console for errors
+
+2. **Real-time updates not working**
+   - Ensure Supabase Realtime is enabled for your project
+   - Verify subscription channels in the code
+   - Check network connectivity
+
+3. **Charts not rendering properly**
+   - Ensure data format matches what the charts expect
+   - Check for null or undefined values in data
+   - Verify that chart dimensions are appropriate for the container
+
+4. **Styling issues**
+   - Run `npm run build` to ensure TailwindCSS classes are properly generated
+   - Check for conflicting styles
+   - Verify browser compatibility
+
+## FUTURE ENHANCEMENTS
+--------------------
+Potential improvements for future versions:
+
+1. Authentication system for admin access
+2. Export functionality for data (CSV, PDF)
+3. More advanced filtering and search capabilities
+4. Additional chart types and analytics insights
+5. Dark mode support
+6. Mobile app version
+7. Notification system for important events
+8. Custom dashboards and saved views
+9. Integration with other marketing and CRM tools
+10. AI-powered insights and recommendations
+
+## MAINTENANCE
+------------
+Regular maintenance tasks:
+
+1. Update dependencies regularly for security and performance
+2. Monitor Supabase usage and quotas
+3. Back up database regularly
+4. Check for and fix browser compatibility issues
+5. Optimize performance for large datasets
+
+## CONTACT & SUPPORT
+------------------
+For issues, questions, or feature requests, please contact:
+- Project maintainer: [Contact Information]
+- Repository: [Repository URL]
+- Documentation: This file and README.md
+
+Last updated: June 18, 2025
