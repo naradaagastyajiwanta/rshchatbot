@@ -77,16 +77,17 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
   }, [waNumber]);
 
   // Get lead status color
+  // improved UI: Updated color scheme for lead status badges
   const getLeadStatusColor = (status: string) => {
     switch (status) {
       case 'Hot':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-700';
       case 'Warm':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-700';
       case 'Cold':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-700';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
@@ -134,99 +135,128 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
   }
 
   return (
-    <div className="space-y-8">
-      {/* User Profile Card */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">{user.name || 'Unknown'}</h2>
-            <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getLeadStatusColor(user.lead_status)}`}>
-              {user.lead_status}
-            </span>
+    // improved UI: 2-column layout with profile on left, chat on right
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Left Column: User Profile Card */}
+      <div>
+        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mb-6">
+          <div className="p-6 border-b border-gray-100">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">{user.name || 'Unknown'}</h2>
+                <p className="text-sm text-gray-500 mt-1">{user.wa_number}</p>
+              </div>
+              <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getLeadStatusColor(user.lead_status)}`}>
+                {user.lead_status}
+              </span>
+            </div>
           </div>
-          <p className="text-sm text-gray-500 mt-1">{user.wa_number}</p>
-        </div>
-        
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* improved UI: Profile data in styled boxes */}
+          <div className="p-6 space-y-6">
+            {/* Personal Information */}
             <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-4">Personal Information</h3>
+              <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Personal Information
+              </h3>
               
-              <div className="space-y-3">
-                <div>
-                  <span className="text-sm font-medium text-gray-500">Age</span>
-                  <p>{user.age || 'Not specified'}</p>
+              <div className="bg-gray-50 p-4 rounded-xl space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-xs font-medium text-gray-500 block mb-1">Age</span>
+                    <p className="text-sm font-medium">{user.age || 'Not specified'}</p>
+                  </div>
+                  
+                  <div>
+                    <span className="text-xs font-medium text-gray-500 block mb-1">Gender</span>
+                    <p className="text-sm font-medium">{user.gender || 'Not specified'}</p>
+                  </div>
                 </div>
                 
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Gender</span>
-                  <p>{user.gender || 'Not specified'}</p>
-                </div>
-                
-                <div>
-                  <span className="text-sm font-medium text-gray-500">Domisili</span>
-                  <p>{user.domisili || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Domisili</span>
+                  <p className="text-sm font-medium">{user.domisili || 'Not specified'}</p>
                 </div>
               </div>
             </div>
             
+            {/* Health Information */}
             <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-4">Health Information</h3>
+              <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                Health Information
+              </h3>
               
-              <div className="space-y-3">
+              <div className="bg-gray-50 p-4 rounded-xl space-y-3">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Keluhan</span>
-                  <p>{user.keluhan || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Keluhan</span>
+                  <p className="text-sm font-medium">{user.keluhan || 'Not specified'}</p>
                 </div>
                 
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Barrier</span>
-                  <p>{user.barrier || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Barrier</span>
+                  <p className="text-sm font-medium">{user.barrier || 'Not specified'}</p>
                 </div>
                 
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Urgency Level</span>
-                  <p>{user.urgency_level || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Urgency Level</span>
+                  <p className="text-sm font-medium">{user.urgency_level || 'Not specified'}</p>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Additional Information</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <span className="text-sm font-medium text-gray-500">Symptoms</span>
-                <p className="mt-1">{user.symptoms || 'Not specified'}</p>
-              </div>
+            {/* Additional Information */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
+                <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Additional Information
+              </h3>
               
-              <div>
-                <span className="text-sm font-medium text-gray-500">Medical History</span>
-                <p className="mt-1">{user.medical_history || 'Not specified'}</p>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium text-gray-500">Emotion</span>
-                <p className="mt-1">{user.emotion || 'Not specified'}</p>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium text-gray-500">Program Awareness</span>
-                <p className="mt-1">{user.program_awareness || 'Not specified'}</p>
+              <div className="bg-gray-50 p-4 rounded-xl space-y-4">
+                <div>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Symptoms</span>
+                  <p className="text-sm">{user.symptoms || 'Not specified'}</p>
+                </div>
+                
+                <div>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Medical History</span>
+                  <p className="text-sm">{user.medical_history || 'Not specified'}</p>
+                </div>
+                
+                <div>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Emotion</span>
+                  <p className="text-sm">{user.emotion || 'Not specified'}</p>
+                </div>
+                
+                <div>
+                  <span className="text-xs font-medium text-gray-500 block mb-1">Program Awareness</span>
+                  <p className="text-sm">{user.program_awareness || 'Not specified'}</p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="mt-6 text-sm text-gray-500">
-            Last updated: {user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}
+            
+            <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+              Last updated: {user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Chat History */}
+      {/* Right Column: Chat History */}
       <div>
-        <h3 className="text-lg font-medium text-gray-800 mb-4">Chat History</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <svg className="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+          </svg>
+          Chat History
+        </h3>
         <ChatViewer waNumber={waNumber} />
       </div>
     </div>

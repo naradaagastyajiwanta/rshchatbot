@@ -137,16 +137,17 @@ export default function UserTable() {
   });
 
   // Get lead status color
+  // improved UI: Updated color scheme for lead status badges
   const getLeadStatusColor = (status: string) => {
     switch (status) {
       case 'Hot':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-700';
       case 'Warm':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-700';
       case 'Cold':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-700';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-700';
     }
   };
 
@@ -314,7 +315,8 @@ export default function UserTable() {
               filteredUsers.map((user, index) => (
                 <tr 
                   key={user.wa_number} 
-                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150`}
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150`} 
+                  // improved UI: Zebra-striping for better readability
                 >
                   <td className="px-6 py-4">
                     <Link 
@@ -357,27 +359,27 @@ export default function UserTable() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {/* improved UI: Better lead status badges */}
+                    {/* improved UI: Better lead status badges with updated colors */}
                     {user.lead_status === 'Hot' && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
                         <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
                         Hot
                       </span>
                     )}
                     {user.lead_status === 'Warm' && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">
                         <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1.5"></span>
                         Warm
                       </span>
                     )}
                     {user.lead_status === 'Cold' && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                        <span className="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span>
                         Cold
                       </span>
                     )}
                     {!user.lead_status && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                         Unknown
                       </span>
                     )}

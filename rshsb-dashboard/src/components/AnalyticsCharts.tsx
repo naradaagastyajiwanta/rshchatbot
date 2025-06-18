@@ -223,9 +223,9 @@ export default function AnalyticsCharts() {
 
   return (
     // improved UI: Modern analytics layout with grid
-    <div>
+    <div className="space-y-6">
       {/* improved UI: Analytics overview header */}
-      <div className="mb-6">
+      <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
         <h2 className="text-2xl font-bold text-gray-800">Dashboard Analytics</h2>
         <p className="text-gray-500 mt-1">Real-time metrics and insights for Rumah Sehat Holistik</p>
       </div>
@@ -240,6 +240,8 @@ export default function AnalyticsCharts() {
               Last 7 days
             </span>
           </div>
+          {/* improved UI: Small title for chart */}
+          <p className="text-sm font-medium text-gray-500 mb-3">Message volume trends over time</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -287,6 +289,8 @@ export default function AnalyticsCharts() {
               {analyticsData.leadStatusDistribution.reduce((sum, item) => sum + item.value, 0)} users
             </span>
           </div>
+          {/* improved UI: Small title for chart */}
+          <p className="text-sm font-medium text-gray-500 mb-3">Breakdown of user lead qualification status</p>
           <div className="h-80 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -333,6 +337,8 @@ export default function AnalyticsCharts() {
               Most common complaints
             </span>
           </div>
+          {/* improved UI: Small title for chart */}
+          <p className="text-sm font-medium text-gray-500 mb-3">Most frequently reported health concerns</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -377,6 +383,8 @@ export default function AnalyticsCharts() {
               Common obstacles
             </span>
           </div>
+          {/* improved UI: Small title for chart */}
+          <p className="text-sm font-medium text-gray-500 mb-3">Key obstacles preventing users from seeking care</p>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
