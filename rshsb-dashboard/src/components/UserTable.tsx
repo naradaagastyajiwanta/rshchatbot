@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Link from 'next/link';
+import ExportPDFModal from './ExportPDFModal';
 
 interface UserProfile {
   wa_number: string;
@@ -33,6 +34,9 @@ export default function UserTable() {
     domisili: '',
     lead_status: ''
   });
+  
+  // Export modal state
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   
   // Unique filter options
   const [filterOptions, setFilterOptions] = useState({
@@ -188,8 +192,19 @@ export default function UserTable() {
           <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profiles</h2>
           <p className="text-sm text-gray-700 mt-1">{filteredUsers.length} users found</p>
         </div>
-        <div className="text-sm text-gray-500">
-          Last updated: {new Date().toLocaleDateString()}
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-500">
+            Last updated: {new Date().toLocaleDateString()}
+          </div>
+          <button
+            onClick={() => setIsExportModalOpen(true)}
+            className="px-3 py-1.5 bg-[#8e003b] text-white rounded-md text-sm font-medium hover:bg-[#6d002d] transition-colors flex items-center"
+          >
+            <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            Export to PDF
+          </button>
         </div>
       </div>
       
@@ -428,6 +443,13 @@ export default function UserTable() {
           </button>
         </div>
       </div>
+      
+      {/* Export PDF Modal */}
+      <ExportPDFModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        filterOptions={filterOptions}
+      />
     </div>
   );
 }
