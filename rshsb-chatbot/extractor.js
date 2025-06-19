@@ -10,14 +10,15 @@ const { updateUserProfile } = require('./supabase');
  * Process a message to extract insights and update the user profile
  * @param {string} message - The message to extract insights from
  * @param {string} waNumber - The WhatsApp number of the user
+ * @param {string} threadId - Optional thread ID for continuing conversations
  * @returns {Object} - The extracted insights
  */
-async function processMessageForInsights(message, waNumber) {
+async function processMessageForInsights(message, waNumber, threadId = null) {
   try {
     console.log(`Extracting insights from message for ${waNumber}...`);
     
-    // Extract insights from the message
-    const insights = await extractInsight(message);
+    // Extract insights from the message, passing waNumber to store thread ID
+    const insights = await extractInsight(message, threadId, waNumber);
     
     // If we got any insights, update the user profile
     if (insights && !insights.error) {

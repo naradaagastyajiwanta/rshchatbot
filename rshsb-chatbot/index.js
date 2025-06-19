@@ -150,8 +150,8 @@ async function connectToWhatsApp() {
         await logChat(waNumber, messageContent, 'incoming', threadId);
         
         // Send to OpenAI Assistant and get response
-        console.log(`Sending message to OpenAI Assistant with thread ID: ${threadId || 'new'}`);
-        const assistantResponse = await sendToChatbot(messageContent, threadId);
+        console.log(`Sending message to OpenAI Assistant with thread ID: ${threadId || 'new'} for ${waNumber}`);
+        const assistantResponse = await sendToChatbot(messageContent, threadId, waNumber);
         
         // Send the response back to the user
         await sock.sendMessage(chatId, { text: assistantResponse.response });
@@ -160,7 +160,7 @@ async function connectToWhatsApp() {
         await logChat(waNumber, assistantResponse.response, 'outgoing', assistantResponse.threadId);
         
         // Process the message for insights in the background
-        processMessageForInsights(messageContent, waNumber)
+        processMessageForInsights(messageContent, waNumber, assistantResponse.threadId)
           .then(insights => {
             if (!insights.error) {
               console.log(`Insights extracted for ${waNumber}:`, insights);

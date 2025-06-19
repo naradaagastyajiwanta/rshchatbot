@@ -108,12 +108,21 @@ async function logChat(waNumber, message, direction, threadId) {
 }
 
 /**
- * Get thread ID for a WhatsApp number if it exists
+ * Get thread ID for a WhatsApp number if it exists (DEPRECATED)
+ * @deprecated Use getOrCreateChatbotThreadId or getOrCreateAnalyticThreadId instead
  * @param {string} waNumber - WhatsApp phone number
  * @returns {string|null} - Thread ID or null if not found
  */
 async function getThreadId(waNumber) {
+  console.warn('getThreadId is deprecated. Use getOrCreateChatbotThreadId or getOrCreateAnalyticThreadId instead');
   try {
+    // First try to get from user_profiles
+    const profile = await getUserProfile(waNumber);
+    if (profile && profile.thread_id_chatbot) {
+      return profile.thread_id_chatbot;
+    }
+    
+    // Fall back to legacy method if not found in user_profiles
     const { data, error } = await supabase
       .from('chat_logs')
       .select('thread_id')
@@ -189,10 +198,99 @@ async function getUserProfile(waNumber) {
   }
 }
 
+/**
+ * Generic helper to get or create a thread ID
+ * @param {string} waNumber - WhatsApp phone number
+ * @param {string} columnName - Column name in user_profiles table ('thread_id_chatbot' or 'thread_id_analytic')
+ * @param {string} assistantId - OpenAI Assistant ID to use for thread creation
+ * @returns {Promise<string|null>} - Thread ID or null if error
+ */
+async function getOrCreateThreadId(waNumber, columnName, assistantId) {
+  if (!waNumber) {
+    console.error('Missing WhatsApp number in getOrCreateThreadId');
+    return null;
+  }
+
+  try {
+    // Get user profile
+    const profile = await getUserProfile(waNumber);
+    
+    // If thread ID exists in profile, return it
+    if (profile && profile[columnName] && profile[columnName].startsWith('thread_')) {
+      console.log(`Using existing ${columnName} from user_profiles: ${profile[columnName]}`);
+      return profile[columnName];
+    }
+    
+    // Thread ID doesn't exist or is invalid, create a new one using OpenAI API
+    console.log(`No valid ${columnName} found for ${waNumber}. Creating new thread...`);
+    
+    // Create a new thread using axios
+    const axios = require('axios');
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'OpenAI-Beta': 'assistants=v2'
+    };
+    
+    const threadResponse = await axios.post(
+      'https://api.openai.com/v1/threads',
+      {}, // empty body as per the API docs
+      { headers }
+    );
+    
+    const threadId = threadResponse.data.id;
+    console.log(`Created new thread with ID: ${threadId}`);
+    
+    // Update user profile with new thread ID
+    const updateData = {};
+    updateData[columnName] = threadId;
+    
+    const { error } = await supabase
+      .from('user_profiles')
+      .upsert({ 
+        wa_number: waNumber,
+        ...updateData,
+        updated_at: new Date().toISOString()
+      });
+    
+    if (error) {
+      console.error(`Error updating ${columnName} in user_profiles:`, error);
+      // Still return the thread ID even if saving to DB failed
+    }
+    
+    return threadId;
+  } catch (err) {
+    console.error(`Exception in getOrCreateThreadId for ${columnName}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Get or create a thread ID for the main chatbot
+ * @param {string} waNumber - WhatsApp phone number
+ * @returns {Promise<string|null>} - Thread ID or null if error
+ */
+async function getOrCreateChatbotThreadId(waNumber) {
+  return getOrCreateThreadId(waNumber, 'thread_id_chatbot', process.env.ASSISTANT_ID_CHATBOT);
+}
+
+/**
+ * Get or create a thread ID for the analytics/insight assistant
+ * @param {string} waNumber - WhatsApp phone number
+ * @returns {Promise<string|null>} - Thread ID or null if error
+ */
+async function getOrCreateAnalyticThreadId(waNumber) {
+  return getOrCreateThreadId(waNumber, 'thread_id_analytic', process.env.ASSISTANT_ID_INSIGHT);
+}
+
 module.exports = {
   supabase,
   logChat,
-  getThreadId,
+  getThreadId, // Kept for backward compatibility
   updateUserProfile,
-  getUserProfile
+  getUserProfile,
+  checkDatabaseConnection,
+  getOrCreateChatbotThreadId,
+  getOrCreateAnalyticThreadId,
+  getOrCreateThreadId // Export the generic helper for advanced use cases
 };

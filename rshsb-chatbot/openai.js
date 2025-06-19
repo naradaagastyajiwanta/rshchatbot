@@ -25,14 +25,25 @@ console.log('OpenAI client initialized with axios and assistants=v2 beta header'
  * Send a message to the chatbot assistant
  * @param {string} message - Message to send to the chatbot
  * @param {string} threadId - Thread ID for continuing conversations (optional)
+ * @param {string} waNumber - WhatsApp phone number (optional, used to store thread ID)
  * @returns {Object} - Response from the chatbot and thread ID
  */
-async function sendToChatbot(message, threadId = null) {
+async function sendToChatbot(message, threadId = null, waNumber = null) {
   let createdThread = null;
   let runId = null;
+  const { getOrCreateChatbotThreadId } = require('./supabase');
   
   try {
-    console.log(`DEBUG - Thread ID received: ${threadId}, Type: ${typeof threadId}`);
+    console.log(`DEBUG - Thread ID received: ${threadId}, Type: ${typeof threadId}, WA Number: ${waNumber}`);
+    
+    // If we have a WhatsApp number, try to get or create a thread ID from user_profiles
+    if (waNumber) {
+      const profileThreadId = await getOrCreateChatbotThreadId(waNumber);
+      if (profileThreadId) {
+        threadId = profileThreadId;
+        console.log(`Using thread ID from user_profiles: ${threadId}`);
+      }
+    }
     
     // Validate or create thread ID - ensure we always have a valid thread ID
     if (!threadId || threadId === 'undefined' || threadId === undefined || threadId === 'null') {
@@ -44,6 +55,24 @@ async function sendToChatbot(message, threadId = null) {
       );
       threadId = threadResponse.data.id;
       console.log(`Created new thread with ID: ${threadId}`);
+      
+      // If we have a WhatsApp number, store the new thread ID
+      if (waNumber) {
+        const supabase = require('./supabase');
+        const updateData = { thread_id_chatbot: threadId };
+        
+        const { error } = await supabase.supabase
+          .from('user_profiles')
+          .upsert({ 
+            wa_number: waNumber,
+            ...updateData,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (error) {
+          console.error('Error updating thread_id_chatbot in user_profiles:', error);
+        }
+      }
     } else {
       // Ensure thread ID is properly formatted
       if (!threadId.startsWith('thread_')) {
@@ -55,6 +84,24 @@ async function sendToChatbot(message, threadId = null) {
         );
         threadId = threadResponse.data.id;
         console.log(`Created new thread with ID: ${threadId}`);
+        
+        // If we have a WhatsApp number, store the new thread ID
+        if (waNumber) {
+          const supabase = require('./supabase');
+          const updateData = { thread_id_chatbot: threadId };
+          
+          const { error } = await supabase.supabase
+            .from('user_profiles')
+            .upsert({ 
+              wa_number: waNumber,
+              ...updateData,
+              updated_at: new Date().toISOString()
+            });
+          
+          if (error) {
+            console.error('Error updating thread_id_chatbot in user_profiles:', error);
+          }
+        }
       } else {
         // Verify the thread ID exists by attempting to retrieve it
         try {
@@ -73,6 +120,24 @@ async function sendToChatbot(message, threadId = null) {
           );
           threadId = threadResponse.data.id;
           console.log(`Created new thread with ID: ${threadId}`);
+          
+          // If we have a WhatsApp number, store the new thread ID
+          if (waNumber) {
+            const supabase = require('./supabase');
+            const updateData = { thread_id_chatbot: threadId };
+            
+            const { error } = await supabase.supabase
+              .from('user_profiles')
+              .upsert({ 
+                wa_number: waNumber,
+                ...updateData,
+                updated_at: new Date().toISOString()
+              });
+            
+            if (error) {
+              console.error('Error updating thread_id_chatbot in user_profiles:', error);
+            }
+          }
         }
       }
     }
@@ -167,20 +232,52 @@ async function sendToChatbot(message, threadId = null) {
  * Extract insights from a message using the insight extractor assistant
  * @param {string} message - Message to extract insights from
  * @param {string} threadId - Optional thread ID for continuing conversations
+ * @param {string} waNumber - WhatsApp phone number (optional, used to store thread ID)
  * @returns {Object} - Extracted insights as JSON
  */
-async function extractInsight(message, threadId = null) {
+async function extractInsight(message, threadId = null, waNumber = null) {
+  const { getOrCreateAnalyticThreadId } = require('./supabase');
+  
   try {
-    // Always create a new thread for insight extraction to ensure clean context
-    console.log('Creating new thread for insight extraction...');
-    const threadResponse = await axios.post(
-      'https://api.openai.com/v1/threads',
-      {}, // empty body as per the API docs
-      { headers }
-    );
+    // If we have a WhatsApp number, try to get or create a thread ID from user_profiles
+    if (waNumber) {
+      const profileThreadId = await getOrCreateAnalyticThreadId(waNumber);
+      if (profileThreadId) {
+        threadId = profileThreadId;
+        console.log(`Using analytic thread ID from user_profiles: ${threadId}`);
+      }
+    }
     
-    threadId = threadResponse.data.id;
-    console.log(`Created new thread with ID: ${threadId}`);
+    // If no thread ID from user_profiles, create a new one
+    if (!threadId || !threadId.startsWith('thread_')) {
+      console.log('Creating new thread for insight extraction...');
+      const threadResponse = await axios.post(
+        'https://api.openai.com/v1/threads',
+        {}, // empty body as per the API docs
+        { headers }
+      );
+      
+      threadId = threadResponse.data.id;
+      console.log(`Created new thread with ID: ${threadId}`);
+      
+      // If we have a WhatsApp number, store the new thread ID
+      if (waNumber) {
+        const supabase = require('./supabase');
+        const updateData = { thread_id_analytic: threadId };
+        
+        const { error } = await supabase.supabase
+          .from('user_profiles')
+          .upsert({ 
+            wa_number: waNumber,
+            ...updateData,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (error) {
+          console.error('Error updating thread_id_analytic in user_profiles:', error);
+        }
+      }
+    }
     
     // Add the message to the thread
     console.log(`Adding message to thread ${threadId}...`);
