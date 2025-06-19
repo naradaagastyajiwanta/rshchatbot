@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { usePageTitleUpdater } from "../../utils/usePageTitleUpdater";
 
 interface ConnectionStatus {
   state: 'disconnected' | 'connecting' | 'connected';
@@ -16,6 +17,9 @@ export default function WhatsAppConnectPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshCountdown, setRefreshCountdown] = useState<number>(10);
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus | null>(null);
+
+  // Set the page title when component mounts
+  usePageTitleUpdater('WhatsApp Connect');
 
   const fetchQrCode = async () => {
     try {

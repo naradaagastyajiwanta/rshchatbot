@@ -2,12 +2,16 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { PageTitleProvider, usePageTitle } from '../../contexts/PageTitleContext';
 
-export default function ClientLayout({
+// Wrapper component that uses the context
+function ClientLayoutContent({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Use the page title context
+  const { pageTitle } = usePageTitle();
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* improved UI: Ultra-modern sidebar with advanced gradient and enhanced styling */}
@@ -121,7 +125,7 @@ export default function ClientLayout({
           className="bg-white bg-opacity-90 backdrop-blur-sm border-b border-blue-100 shadow-md p-5 sticky top-0 z-10"
         >
           <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">Rumah Sehat Holistik</h1>
+            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">{pageTitle}</h1>
             <div className="text-sm bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-1.5 rounded-full text-white font-medium shadow-md flex items-center space-x-1">
               <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse mr-2"></span>
               <span>Admin Dashboard</span>
@@ -142,5 +146,14 @@ export default function ClientLayout({
         </motion.main>
       </motion.div>
     </div>
+  );
+}
+
+// Export the layout with the context provider
+export default function ClientLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <PageTitleProvider>
+      <ClientLayoutContent children={children} />
+    </PageTitleProvider>
   );
 }

@@ -1,14 +1,14 @@
+'use client';
+
 import AnalyticsCharts from '../../components/AnalyticsCharts';
+import { usePageTitleUpdater } from '../../utils/usePageTitleUpdater';
 
 export default function AnalyticsPage() {
+  // Set the page title when component mounts
+  usePageTitleUpdater('Analytics Dashboard');
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
-        <div className="text-sm text-gray-500">
-          Insights and data visualization
-        </div>
-      </div>
+    <div>
       
       <AnalyticsCharts />
     </div>
