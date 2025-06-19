@@ -21,12 +21,15 @@ interface UserProfile {
   urgency_level: string;
   emotion: string;
   program_awareness: string;
+  is_bot_active: boolean;
 }
 
 export default function UserDetail({ waNumber }: { waNumber: string }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -136,8 +139,60 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
     );
   }
 
+  // Function to toggle bot active status
+  const toggleBotActive = async () => {
+    if (!user) return;
+    
+    try {
+      const newStatus = !user.is_bot_active;
+      
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ is_bot_active: newStatus })
+        .eq('wa_number', waNumber);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setUser({
+        ...user,
+        is_bot_active: newStatus
+      });
+      
+      // Show toast message
+      setToastMessage(newStatus ? "Bot enabled" : "Bot disabled");
+      setShowToast(true);
+      
+      // Hide toast after 3 seconds
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+      
+    } catch (err) {
+      console.error('Error updating bot status:', err);
+      setToastMessage("Failed to update bot status");
+      setShowToast(true);
+      
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Toast notification */}
+      {showToast && toastMessage && (
+        <div className="fixed top-4 right-4 bg-white shadow-lg rounded-lg p-4 z-50 border-l-4 border-[#8e003b] animate-fade-in-out">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-[#8e003b] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p className="text-gray-800 font-medium">{toastMessage}</p>
+          </div>
+        </div>
+      )}
+      
       <div className="bg-gradient-to-br from-white to-[#fdf7fa] p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-[#8e003b]">Profile Information</h3>
@@ -170,6 +225,36 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               {user.lead_status}
             </span>
           </div>
+        </div>
+        
+        {/* Bot Active Toggle */}
+        <div className="mb-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span className="font-medium text-gray-900">Bot Active</span>
+            </div>
+            
+            {/* Custom Toggle Switch */}
+            <button 
+              onClick={toggleBotActive}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#8e003b] focus:ring-offset-2 ${user?.is_bot_active ? 'bg-[#8e003b]' : 'bg-gray-300'}`}
+              role="switch"
+              aria-checked={user?.is_bot_active || false}
+            >
+              <span className="sr-only">Toggle bot active</span>
+              <span 
+                className={`${user?.is_bot_active ? 'translate-x-6' : 'translate-x-1'} inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+              />
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 mt-2 ml-7">
+            {user?.is_bot_active 
+              ? "Bot is currently active and will respond to user messages." 
+              : "Bot is disabled and will not respond to user messages."}
+          </p>
         </div>
         <div className="space-y-6">
           <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf] animate-pulse-slow">

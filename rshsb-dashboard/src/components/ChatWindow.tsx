@@ -18,6 +18,7 @@ interface UserProfile {
   wa_number: string;
   name: string;
   last_updated: string;
+  is_bot_active?: boolean;
 }
 
 interface ChatWindowProps {
@@ -29,6 +30,9 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isBotActive, setIsBotActive] = useState<boolean>(true);
+  const [showToast, setShowToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Use our custom hook for realtime updates
@@ -47,7 +51,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       try {
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('wa_number, name, last_updated')
+          .select('wa_number, name, last_updated, is_bot_active')
           .eq('wa_number', waNumber)
           .single();
         
@@ -57,6 +61,8 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
         }
         
         setUserProfile(data);
+        // Default to true if is_bot_active is undefined/null
+        setIsBotActive(data.is_bot_active !== false);
       } catch (err) {
         console.error('Error in fetchUserProfile:', err);
       }
@@ -64,6 +70,35 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
     
     fetchUserProfile();
   }, [waNumber]);
+  
+  // Toggle bot active status
+  const toggleBotActive = async () => {
+    if (!waNumber) return;
+    
+    try {
+      const newStatus = !isBotActive;
+      
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ is_bot_active: newStatus })
+        .eq('wa_number', waNumber);
+      
+      if (error) {
+        console.error('Error updating bot status:', error);
+        return;
+      }
+      
+      setIsBotActive(newStatus);
+      
+      // Show toast notification
+      setToastMessage(newStatus ? 'Bot enabled' : 'Bot disabled');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      
+    } catch (err) {
+      console.error('Error toggling bot status:', err);
+    }
+  };
 
   // Fetch initial messages
   useEffect(() => {
@@ -169,16 +204,41 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   return (
     <div className="flex-1 flex flex-col w-full h-full">
       {/* Chat header */}
-      <div className="p-2 bg-gray-50 border-b flex items-center">
-        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
-          {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : waNumber.charAt(0)}
+      <div className="p-2 bg-gray-50 border-b flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
+            {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : waNumber.charAt(0)}
+          </div>
+          <div>
+            <h2 className="font-semibold text-gray-800">
+              {userProfile?.name || 'Unknown'}
+            </h2>
+            <p className="text-xs text-gray-500">{waNumber}</p>
+          </div>
         </div>
-        <div>
-          <h2 className="font-semibold text-gray-800">
-            {userProfile?.name || 'Unknown'}
-          </h2>
-          <p className="text-xs text-gray-500">{waNumber}</p>
+        
+        {/* Bot toggle switch */}
+        <div className="flex items-center">
+          <span className="text-sm text-gray-600 mr-2">Bot Active</span>
+          <button 
+            onClick={toggleBotActive}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${isBotActive ? 'bg-pink-500 focus:ring-pink-500' : 'bg-gray-300 focus:ring-gray-400'}`}
+          >
+            <span className="sr-only">Toggle bot active status</span>
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isBotActive ? 'translate-x-6' : 'translate-x-1'}`}
+            />
+          </button>
         </div>
+        
+        {/* Toast notification */}
+        {showToast && (
+          <div className="toast-notification">
+            <div className="bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg">
+              {toastMessage}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Chat messages area with WhatsApp-like background */}

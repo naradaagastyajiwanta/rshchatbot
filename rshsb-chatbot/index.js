@@ -15,7 +15,7 @@ const cors = require('cors');
 
 // Import our modules
 const { sendToChatbot } = require('./openai'); // Using updated openai.js with axios implementation
-const { logChat, getThreadId } = require('./supabase');
+const { logChat, getThreadId, getUserProfile } = require('./supabase');
 const { processMessageForInsights } = require('./extractor');
 
 // Initialize Express server
@@ -148,6 +148,15 @@ async function connectToWhatsApp() {
         // Log the incoming message
         const threadId = await getThreadId(waNumber);
         await logChat(waNumber, messageContent, 'incoming', threadId);
+        
+        // Check if bot is active for this user
+        const userProfile = await getUserProfile(waNumber);
+        const isBotActive = userProfile?.is_bot_active !== false; // Default to true if not set
+        
+        if (!isBotActive) {
+          console.log(`Bot is disabled for user ${waNumber}. Silently ignoring message.`);
+          return; // Skip further processing without sending any notification
+        }
         
         // Send to OpenAI Assistant and get response
         console.log(`Sending message to OpenAI Assistant with thread ID: ${threadId || 'new'} for ${waNumber}`);
