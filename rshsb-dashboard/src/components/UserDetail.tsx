@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import ChatViewer from './ChatViewer';
 import Link from 'next/link';
+import ResetThreadButton from './ResetThreadButton';
 
 interface UserProfile {
   wa_number: string;
@@ -140,11 +141,35 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
       <div className="bg-gradient-to-br from-white to-[#fdf7fa] p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-[#8e003b]">Profile Information</h3>
-          <span 
-            className={`text-xs px-3 py-1 rounded-full font-medium ${getLeadStatusColor(user.lead_status)}`}
-          >
-            {user.lead_status}
-          </span>
+          <div className="flex items-center space-x-3">
+            <ResetThreadButton 
+              waNumber={waNumber} 
+              onSuccess={() => {
+                // Refresh user data after reset
+                const fetchUserProfile = async () => {
+                  try {
+                    const { data, error } = await supabase
+                      .from('user_profiles')
+                      .select('*')
+                      .eq('wa_number', waNumber)
+                      .single();
+                    
+                    if (error) throw error;
+                    setUser(data);
+                  } catch (err) {
+                    console.error('Error refreshing user profile:', err);
+                  }
+                };
+                
+                fetchUserProfile();
+              }} 
+            />
+            <span 
+              className={`text-xs px-3 py-1 rounded-full font-medium ${getLeadStatusColor(user.lead_status)}`}
+            >
+              {user.lead_status}
+            </span>
+          </div>
         </div>
         <div className="space-y-6">
           <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf] animate-pulse-slow">
