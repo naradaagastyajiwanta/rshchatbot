@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 interface UserProfile {
@@ -26,6 +26,8 @@ interface UserSidebarProps {
 export default function UserSidebar({ users, selectedUser, onSelectUser }: UserSidebarProps) {
   const [lastMessages, setLastMessages] = useState<Record<string, ChatMessage>>({});
   const [loading, setLoading] = useState<boolean>(true);
+  // 🟢 enhanced: status & search
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const fetchLastMessages = async () => {
@@ -122,6 +124,37 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
     if (!message) return '';
     return message.length > maxLength ? message.substring(0, maxLength) + '...' : message;
   };
+  
+  // 🟢 enhanced: status & search
+  // Check if user is online (active in the last 2 minutes)
+  const isUserOnline = (lastUpdated: string): boolean => {
+    if (!lastUpdated) return false;
+    const lastActive = new Date(lastUpdated).getTime();
+    const now = Date.now();
+    const twoMinutesMs = 2 * 60 * 1000;
+    return now - lastActive < twoMinutesMs;
+  };
+  
+  // 🟢 enhanced: status & search
+  // Filter users based on search term
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm.trim()) return users;
+    
+    const term = searchTerm.toLowerCase().trim();
+    return users.filter(user => {
+      // Search by name
+      if (user.name?.toLowerCase().includes(term)) return true;
+      
+      // Search by WA number
+      if (user.wa_number.toLowerCase().includes(term)) return true;
+      
+      // Search by last message content
+      const lastMessage = lastMessages[user.wa_number]?.message;
+      if (lastMessage && lastMessage.toLowerCase().includes(term)) return true;
+      
+      return false;
+    });
+  }, [users, searchTerm, lastMessages]);
 
   return (
     <div className="w-72 bg-white border-r shadow-sm flex flex-col">
@@ -138,13 +171,31 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
         </button>
       </div>
       
+      {/* 🟢 enhanced: status & search */}
+      <div className="p-2 border-b border-gray-100">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <input
+            type="search"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search users or messages"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+      
       {loading && users.length > 0 ? (
         <div className="flex justify-center items-center p-6 flex-grow">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
         </div>
       ) : (
         <div className="overflow-y-auto flex-grow">
-          {users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6 text-center">
               <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -154,15 +205,17 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <li 
                   key={user.wa_number}
                   className={`cursor-pointer hover:bg-gray-50 transition-colors ${selectedUser === user.wa_number ? 'bg-blue-50' : ''}`}
                   onClick={() => onSelectUser(user.wa_number)}
                 >
                   <div className="flex items-center p-4">
-                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3 flex-shrink-0">
+                    <div className="relative h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3 flex-shrink-0">
                       {user.name ? user.name.charAt(0).toUpperCase() : user.wa_number.charAt(0)}
+                      {/* 🟢 enhanced: status & search */}
+                      <div className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-white ${isUserOnline(user.last_updated) ? 'bg-green-500' : 'bg-gray-400'}`}></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline">
@@ -173,10 +226,14 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
                           {lastMessages[user.wa_number] ? formatTime(lastMessages[user.wa_number].timestamp) : ''}
                         </span>
                       </div>
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-between">
                         <p className="text-xs text-gray-500 truncate">
                           {user.wa_number}
                         </p>
+                        {/* 🟢 enhanced: status & search */}
+                        <span className={`text-xs ${isUserOnline(user.last_updated) ? 'text-green-500' : 'text-gray-400'}`}>
+                          {isUserOnline(user.last_updated) ? 'Online' : 'Offline'}
+                        </span>
                       </div>
                       <p className="text-sm text-gray-600 truncate mt-1">
                         {lastMessages[user.wa_number] ? (
