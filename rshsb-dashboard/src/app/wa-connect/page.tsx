@@ -100,7 +100,7 @@ export default function WhatsAppConnectPage() {
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4">
+    <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 h-full">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

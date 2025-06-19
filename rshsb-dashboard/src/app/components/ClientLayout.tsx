@@ -122,7 +122,7 @@ function ClientLayoutContent({
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="bg-white bg-opacity-90 backdrop-blur-sm border-b border-blue-100 shadow-md p-5 sticky top-0 z-10"
+          className="bg-white bg-opacity-90 backdrop-blur-sm border-b border-blue-100 shadow-md p-5 sticky top-0 z-30"
         >
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">{pageTitle}</h1>
