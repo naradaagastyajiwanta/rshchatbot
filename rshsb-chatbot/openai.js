@@ -7,6 +7,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const { pollRunStatus } = require('./openai-utils');
+const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId } = require('./supabase');
 
 // Constants from environment variables
 const ASSISTANT_ID_CHATBOT = process.env.ASSISTANT_ID_CHATBOT;
@@ -497,55 +498,230 @@ async function extractInsight(message, threadId = null, waNumber = null) {
       }
     }
     
-    // Add the message to the thread
-    console.log(`Adding message to thread ${threadId}...`);
-    await axios.post(
-      `https://api.openai.com/v1/threads/${threadId}/messages`,
-      {
-        role: 'user',
-        content: message
-      },
-      { headers }
-    );
+    // Check for existing runs on this thread
+    if (waNumber) {
+      try {
+        // First check if there's an existing run_id in the user's profile
+        const userProfile = await getUserProfile(waNumber);
+        
+        if (userProfile && userProfile.run_id_analytic) {
+          const existingRunId = userProfile.run_id_analytic;
+          console.log(`Found existing run_id_analytic: ${existingRunId} for user ${waNumber}`);
+          
+          try {
+            // Poll the existing run until it's no longer in progress or times out
+            console.log(`Polling existing analytic run ${existingRunId} before creating a new one...`);
+            const runStatus = await pollRunStatus(threadId, existingRunId, 30);
+            
+            console.log(`Existing analytic run completed with status: ${runStatus.status}`);
+            // Run is no longer active, we can proceed with creating a new run
+          } catch (pollError) {
+            console.error(`Error polling existing analytic run: ${pollError.message}`);
+            // Continue with creating a new run even if polling failed
+          }
+        } else {
+          // Even if there's no run_id in the user profile, check for active runs on the thread
+          try {
+            console.log(`Checking for any active runs on analytic thread ${threadId}...`);
+            const runsResponse = await axios.get(
+              `https://api.openai.com/v1/threads/${threadId}/runs`,
+              { headers }
+            );
+            
+            const activeRuns = runsResponse.data.data.filter(run => 
+              ['queued', 'in_progress'].includes(run.status)
+            );
+            
+            if (activeRuns.length > 0) {
+              console.log(`Found ${activeRuns.length} active runs on analytic thread ${threadId}`);
+              const latestRun = activeRuns[0]; // Get the most recent active run
+              
+              // Store this run ID in the user profile so other processes know about it
+              try {
+                const { error } = await supabase
+                  .from('user_profiles')
+                  .upsert({ 
+                    wa_number: waNumber,
+                    run_id_analytic: latestRun.id,
+                    updated_at: new Date().toISOString()
+                  });
+                
+                if (!error) {
+                  console.log(`Updated user profile with active analytic run ID: ${latestRun.id}`);
+                }
+              } catch (updateError) {
+                console.error(`Error updating run_id_analytic in profile: ${updateError.message}`);
+              }
+              
+              // Poll this run until it completes
+              console.log(`Polling active analytic run ${latestRun.id} before creating a new one...`);
+              await pollRunStatus(threadId, latestRun.id, 30);
+              console.log(`Active analytic run completed, can proceed with new message`);
+            } else {
+              console.log(`No active runs found on analytic thread ${threadId}`);
+            }
+          } catch (runsError) {
+            console.error(`Error checking active analytic runs: ${runsError.message}`);
+            // Continue even if checking for active runs failed
+          }
+        }
+      } catch (profileError) {
+        console.error(`Error checking user profile for existing analytic run: ${profileError.message}`);
+      }
+    }
+
+    // Verify the thread exists
+    try {
+      await axios.get(`https://api.openai.com/v1/threads/${threadId}`, { headers });
+    } catch (error) {
+      console.error(`Thread ${threadId} not found:`, error.message);
+      return null;
+    }
+
+    // Add the message to the thread - with retry logic
+    let messageAdded = false;
+    let retryAttempts = 0;
+    const maxRetries = 5;
     
-    // Run the insight extractor assistant
-    console.log(`Creating run with insight extractor assistant ${ASSISTANT_ID_INSIGHT}...`);
-    const runResponse = await axios.post(
-      `https://api.openai.com/v1/threads/${threadId}/runs`,
-      {
-        assistant_id: ASSISTANT_ID_INSIGHT
-      },
-      { headers }
-    );
-    
-    const runId = runResponse.data.id;
-    console.log(`Created run ${runId} on thread ${threadId}`);
-    
-    // Wait for the run to complete
-    console.log('Waiting for insight extraction to complete...');
-    let runStatusResponse = await axios.get(
-      `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,
-      { headers }
-    );
-    let runStatus = runStatusResponse.data.status;
-    
-    // Poll for completion with timeout
-    let attempts = 0;
-    const maxAttempts = 30; // Maximum 30 seconds wait
-    
-    while (['queued', 'in_progress'].includes(runStatus) && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-      runStatusResponse = await axios.get(
-        `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,
-        { headers }
-      );
-      runStatus = runStatusResponse.data.status;
-      console.log('Insight extraction status:', runStatus);
-      attempts++;
+    while (!messageAdded && retryAttempts < maxRetries) {
+      try {
+        console.log(`Adding message to analytic thread ${threadId}... (attempt ${retryAttempts + 1})`);
+        await axios.post(
+          `https://api.openai.com/v1/threads/${threadId}/messages`,
+          {
+            role: 'user',
+            content: message
+          },
+          { headers }
+        );
+        messageAdded = true;
+        console.log('Analytic message added successfully');
+      } catch (messageError) {
+        if (messageError.response && 
+            messageError.response.data && 
+            messageError.response.data.error && 
+            messageError.response.data.error.message && 
+            messageError.response.data.error.message.includes('while a run')) {
+          
+          console.log(`Active run detected when adding analytic message, waiting before retry...`);
+          
+          // Extract the run ID from the error message if possible
+          const runIdMatch = messageError.response.data.error.message.match(/run_(\w+)/);
+          if (runIdMatch && runIdMatch[0]) {
+            const activeRunId = runIdMatch[0];
+            console.log(`Detected active analytic run ID from error: ${activeRunId}`);
+            
+            // Wait for this run to complete
+            try {
+              await pollRunStatus(threadId, activeRunId, 10); // Wait up to 10 seconds
+              console.log(`Finished waiting for active analytic run ${activeRunId}`);
+            } catch (pollError) {
+              console.error(`Error polling active analytic run: ${pollError.message}`);
+            }
+          } else {
+            // If we can't extract the run ID, just wait a few seconds
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          
+          retryAttempts++;
+        } else {
+          // If it's a different error, throw it
+          throw messageError;
+        }
+      }
     }
     
-    if (runStatus !== 'completed') {
-      throw new Error(`Insight extraction ended with status: ${runStatus}`);
+    if (!messageAdded) {
+      throw new Error(`Failed to add analytic message after ${maxRetries} attempts due to active runs`);
+    }
+
+    // Run the assistant on the thread - with retry logic
+    let runCreated = false;
+    retryAttempts = 0;
+    let runId = null;
+    
+    while (!runCreated && retryAttempts < maxRetries) {
+      try {
+        console.log(`Creating run with insight extractor assistant ${ASSISTANT_ID_INSIGHT}... (attempt ${retryAttempts + 1})`);
+        const runResponse = await axios.post(
+          `https://api.openai.com/v1/threads/${threadId}/runs`,
+          {
+            assistant_id: ASSISTANT_ID_INSIGHT
+          },
+          { headers }
+        );
+        
+        runId = runResponse.data.id;
+        runCreated = true;
+        console.log(`Created analytic run ${runId} on thread ${threadId}`);
+      } catch (runError) {
+        if (runError.response && 
+            runError.response.data && 
+            runError.response.data.error && 
+            runError.response.data.error.message && 
+            runError.response.data.error.message.includes('already has an active run')) {
+          
+          console.log(`Thread already has an active analytic run, waiting before retry...`);
+          
+          // Extract the run ID from the error message if possible
+          const runIdMatch = runError.response.data.error.message.match(/run_(\w+)/);
+          if (runIdMatch && runIdMatch[0]) {
+            const activeRunId = runIdMatch[0];
+            console.log(`Detected active analytic run ID from error: ${activeRunId}`);
+            
+            // Wait for this run to complete
+            try {
+              await pollRunStatus(threadId, activeRunId, 10); // Wait up to 10 seconds
+              console.log(`Finished waiting for active analytic run ${activeRunId}`);
+            } catch (pollError) {
+              console.error(`Error polling active analytic run: ${pollError.message}`);
+            }
+          } else {
+            // If we can't extract the run ID, just wait a few seconds
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          
+          retryAttempts++;
+        } else {
+          // If it's a different error, throw it
+          throw runError;
+        }
+      }
+    }
+    
+    if (!runCreated) {
+      throw new Error(`Failed to create analytic run after ${maxRetries} attempts due to active runs`);
+    }
+    
+    // Store the run_id in the user_profiles table
+    if (waNumber && runId) {
+      try {
+        const { error } = await supabase
+          .from('user_profiles')
+          .upsert({ 
+            wa_number: waNumber,
+            run_id_analytic: runId,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (!error) {
+          console.log(`Stored run_id_analytic ${runId} for user ${waNumber}`);
+        } else {
+          console.error(`Error storing run_id_analytic in user profile:`, error);
+        }
+      } catch (dbError) {
+        console.error(`Database error storing run_id_analytic:`, dbError);
+      }
+    }
+
+    console.log(`Waiting for insight extraction to complete...`);
+
+    // Poll for completion
+    const runStatus = await pollRunStatus(threadId, runId, 30);
+    console.log(`Insight extraction status: ${runStatus.status}`);
+
+    if (runStatus.status !== 'completed') {
+      throw new Error(`Insight extraction ended with status: ${runStatus.status}`);
     }
     
     // Get the assistant's response
