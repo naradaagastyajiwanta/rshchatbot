@@ -21,7 +21,7 @@ export default function ChatBubble({ message, direction, timestamp, waNumber }: 
           className={`relative p-3 rounded-lg ${
             direction === 'incoming'
               ? 'bg-gray-100 text-gray-800 rounded-tl-none'
-              : 'bg-green-500 text-white rounded-tr-none ml-auto'
+              : 'bg-[#8e003b] text-white rounded-tr-none ml-auto'
           }`}
         >
           {/* Chat bubble tail */}
@@ -29,7 +29,7 @@ export default function ChatBubble({ message, direction, timestamp, waNumber }: 
             className={`absolute top-0 w-4 h-4 ${
               direction === 'incoming'
                 ? '-left-2 bg-gray-100'
-                : '-right-2 bg-green-500'
+                : '-right-2 bg-[#8e003b]'
             }`}
             style={{
               clipPath: direction === 'incoming'
@@ -42,7 +42,7 @@ export default function ChatBubble({ message, direction, timestamp, waNumber }: 
           <div className="whitespace-pre-wrap break-words">{message}</div>
           
           {/* Timestamp */}
-          <div className={`text-xs mt-1 ${direction === 'incoming' ? 'text-gray-500' : 'text-green-100'} text-right`}>
+          <div className={`text-xs mt-1 ${direction === 'incoming' ? 'text-gray-500' : 'text-pink-100'} text-right`}>
             {formatTime(timestamp)}
           </div>
         </div>

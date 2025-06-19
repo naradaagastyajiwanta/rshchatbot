@@ -145,7 +145,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
     return (
       <div className="flex-1 flex justify-center items-center p-6">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8e003b] mb-2"></div>
           <p className="text-gray-500">Loading chat messages...</p>
         </div>
       </div>

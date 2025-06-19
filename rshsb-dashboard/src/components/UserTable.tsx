@@ -157,7 +157,7 @@ export default function UserTable() {
       <div className="bg-white rounded-xl shadow p-6">
         <div className="flex justify-center items-center h-64">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8e003b] mb-3"></div>
             <p className="text-gray-500 font-medium">Loading user profiles...</p>
           </div>
         </div>
@@ -203,7 +203,7 @@ export default function UserTable() {
             Keluhan
           </label>
           <select
-            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#8e003b] focus:ring-1 focus:ring-[#8e003b] transition-colors"
             value={filters.keluhan}
             onChange={(e) => handleFilterChange('keluhan', e.target.value)}
           >
@@ -222,7 +222,7 @@ export default function UserTable() {
             Barrier
           </label>
           <select
-            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#8e003b] focus:ring-1 focus:ring-[#8e003b] transition-colors"
             value={filters.barrier}
             onChange={(e) => handleFilterChange('barrier', e.target.value)}
           >
@@ -242,7 +242,7 @@ export default function UserTable() {
             Domisili
           </label>
           <select
-            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#8e003b] focus:ring-1 focus:ring-[#8e003b] transition-colors"
             value={filters.domisili}
             onChange={(e) => handleFilterChange('domisili', e.target.value)}
           >
@@ -261,7 +261,7 @@ export default function UserTable() {
             Lead Status
           </label>
           <select
-            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="w-full rounded-lg border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#8e003b] focus:ring-1 focus:ring-[#8e003b] transition-colors"
             value={filters.lead_status}
             onChange={(e) => handleFilterChange('lead_status', e.target.value)}
           >
@@ -315,7 +315,7 @@ export default function UserTable() {
               filteredUsers.map((user, index) => (
                 <tr 
                   key={user.wa_number} 
-                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150`} 
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-[#f5e0e8] transition-colors duration-150`} 
                   // improved UI: Zebra-striping for better readability
                 >
                   <td className="px-6 py-4">
@@ -323,10 +323,10 @@ export default function UserTable() {
                       href={`/user/${user.wa_number}`} 
                       className="group flex flex-col"
                     >
-                      <div className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">
+                      <div className="font-medium text-gray-800 group-hover:text-[#8e003b] transition-colors">
                         {user.name || 'Unknown'}
                       </div>
-                      <div className="text-sm text-gray-500 group-hover:text-blue-500 transition-colors">
+                      <div className="text-sm text-gray-500 group-hover:text-[#a5114c] transition-colors">
                         {user.wa_number}
                       </div>
                     </Link>

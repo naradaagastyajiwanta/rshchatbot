@@ -100,7 +100,7 @@ export default function WhatsAppConnectPage() {
   }, []);
 
   return (
-    <div className="flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-green-50 p-4 h-full">
+    <div className="flex items-center justify-center bg-gradient-to-br from-[#f5e0e8] via-white to-[#f5e0e8] p-4 h-full">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -113,7 +113,7 @@ export default function WhatsAppConnectPage() {
             ? 'bg-gradient-to-r from-green-500 to-green-600' 
             : connectionStatus?.state === 'connecting' 
               ? 'bg-gradient-to-r from-yellow-400 to-orange-500'
-              : 'bg-gradient-to-r from-green-400 to-blue-500'}`}
+              : 'bg-gradient-to-r from-[#c32260] to-[#8e003b]'}`}
         >
           <motion.div
             initial={{ opacity: 0 }}

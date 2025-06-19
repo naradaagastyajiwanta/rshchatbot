@@ -181,7 +181,7 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
           </div>
           <input
             type="search"
-            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#8e003b] focus:border-[#8e003b]"
             placeholder="Search users or messages"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -208,7 +208,7 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
               {filteredUsers.map((user) => (
                 <li 
                   key={user.wa_number}
-                  className={`cursor-pointer hover:bg-gray-50 transition-colors ${selectedUser === user.wa_number ? 'bg-blue-50' : ''}`}
+                  className={`cursor-pointer hover:bg-gray-50 transition-colors ${selectedUser === user.wa_number ? 'bg-[#f5e0e8]' : ''}`}
                   onClick={() => onSelectUser(user.wa_number)}
                 >
                   <div className="flex items-center p-4">
@@ -239,7 +239,7 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
                         {lastMessages[user.wa_number] ? (
                           <>
                             {lastMessages[user.wa_number].direction === 'outgoing' && (
-                              <span className="text-xs text-blue-500 mr-1">You: </span>
+                              <span className="text-xs text-[#8e003b] mr-1">You: </span>
                             )}
                             {truncateMessage(lastMessages[user.wa_number].message)}
                           </>

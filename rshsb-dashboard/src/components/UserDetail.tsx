@@ -95,15 +95,15 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
   if (loading) {
     return (
       <div className="lg:col-span-2">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 h-full hover:shadow-xl transition-all duration-300">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] h-full hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-blue-700">Chat History</h3>
-            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
+            <h3 className="text-lg font-bold text-[#8e003b]">Chat History</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
               Loading...
             </span>
           </div>
-          <p className="text-gray-500 font-medium">Loading user profile...</p>
-          <p className="text-xs text-gray-400 mt-1">This may take a moment</p>
+          <p className="text-gray-700 font-medium">Loading user profile...</p>
+          <p className="text-xs text-gray-600 mt-1">This may take a moment</p>
         </div>
       </div>
     );
@@ -137,9 +137,9 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 hover:shadow-xl transition-all duration-300">
+      <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-blue-700">Profile Information</h3>
+          <h3 className="text-lg font-bold text-[#8e003b]">Profile Information</h3>
           <span 
             className={`text-xs px-3 py-1 rounded-full font-medium ${getLeadStatusColor(user.lead_status)}`}
           >
@@ -147,9 +147,9 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
           </span>
         </div>
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-gradient-to-r from-white to-blue-50 p-4 rounded-xl shadow-md border border-blue-100">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">User Profile</h2>
-            <Link href="/users" className="text-blue-600 hover:text-blue-800 flex items-center bg-white px-3 py-1 rounded-lg shadow-sm hover:shadow transition-all duration-200">
+          <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf]">
+            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profile</h2>
+            <Link href="/users" className="text-[#8e003b] hover:text-[#5e0027] flex items-center bg-white px-3 py-1 rounded-lg shadow-sm hover:shadow transition-all duration-200">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
@@ -157,8 +157,8 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
             </Link>
           </div>
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-gray-600 mb-3 flex items-center bg-blue-50 p-2 rounded-lg border-l-2 border-blue-400">
-              <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center bg-[#f5e0e8] p-2 rounded-lg border-l-2 border-[#c32260]">
+              <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
               Personal Information
@@ -166,58 +166,58 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
             <div className="bg-gray-50 p-4 rounded-xl space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-xs font-medium text-gray-500 block mb-1">Age</span>
-                  <p className="text-sm font-medium">{user.age || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-700 block mb-1">Age</span>
+                  <p className="text-sm font-medium text-gray-900">{user.age || 'Not specified'}</p>
                 </div>
                 <div>
-                  <span className="text-xs font-medium text-gray-500 block mb-1">Gender</span>
-                  <p className="text-sm font-medium">{user.gender || 'Not specified'}</p>
+                  <span className="text-xs font-medium text-gray-700 block mb-1">Gender</span>
+                  <p className="text-sm font-medium text-gray-900">{user.gender || 'Not specified'}</p>
                 </div>
               </div>
               <div>
-                <span className="text-xs font-medium text-gray-500 block mb-1">Domisili</span>
-                <p className="text-sm font-medium">{user.domisili || 'Not specified'}</p>
+                <span className="text-xs font-medium text-gray-700 block mb-1">Domisili</span>
+                <p className="text-sm font-medium text-gray-900">{user.domisili || 'Not specified'}</p>
               </div>
             </div>
           </div>
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-gray-600 mb-3 flex items-center bg-blue-50 p-2 rounded-lg border-l-2 border-blue-400">
-              <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center bg-[#f5e0e8] p-2 rounded-lg border-l-2 border-[#c32260]">
+              <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
               </svg>
               Health Information
             </h4>
             <div className="space-y-3">
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <p className="text-xs text-blue-600 font-medium">Keluhan</p>
-                <p className="font-medium">{user.keluhan || 'Not specified'}</p>
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
+                <p className="text-xs text-[#8e003b] font-medium">Keluhan</p>
+                <p className="font-medium text-gray-900">{user.keluhan || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <p className="text-xs text-blue-600 font-medium">Barrier</p>
-                <p className="font-medium">{user.barrier || 'Not specified'}</p>
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
+                <p className="text-xs text-[#8e003b] font-medium">Barrier</p>
+                <p className="font-medium text-gray-900">{user.barrier || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <p className="text-xs text-blue-600 font-medium">Urgency Level</p>
-                <p className="font-medium">{user.urgency_level || 'Not specified'}</p>
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
+                <p className="text-xs text-[#8e003b] font-medium">Urgency Level</p>
+                <p className="font-medium text-gray-900">{user.urgency_level || 'Not specified'}</p>
               </div>
             </div>
           </div>
           
           <div>
-            <h4 className="text-sm font-medium text-gray-600 mb-3 flex items-center bg-blue-50 p-2 rounded-lg border-l-2 border-blue-400">
-              <svg className="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center bg-[#f5e0e8] p-2 rounded-lg border-l-2 border-[#c32260]">
+              <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               Additional Information
             </h4>
             <div className="space-y-3">
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <p className="text-xs text-blue-600 font-medium">Program Awareness</p>
-                <p className="font-medium">{user.program_awareness || 'Not specified'}</p>
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
+                <p className="text-xs text-[#8e003b] font-medium">Program Awareness</p>
+                <p className="font-medium text-gray-900">{user.program_awareness || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <p className="text-xs text-blue-600 font-medium">Last Updated</p>
-                <p className="font-medium">{user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}</p>
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
+                <p className="text-xs text-[#8e003b] font-medium">Last Updated</p>
+                <p className="font-medium text-gray-900">{user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}</p>
               </div>
             </div>
           </div>
@@ -226,10 +226,10 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
       
       {/* Right Column: Chat History */}
       <div className="lg:col-span-2">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-blue-100 h-full hover:shadow-xl transition-all duration-300">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] h-full hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-blue-700">Chat History</h3>
-            <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1 rounded-full font-medium">
+            <h3 className="text-lg font-bold text-[#8e003b]">Chat History</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
               Conversation
             </span>
           </div>

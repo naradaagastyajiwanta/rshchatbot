@@ -103,7 +103,7 @@ export default function LiveChatLayout() {
       <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
         <div className="flex justify-center items-center w-full">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#8e003b] mb-3"></div>
             <p className="text-gray-500 font-medium">Loading chat interface...</p>
           </div>
         </div>
