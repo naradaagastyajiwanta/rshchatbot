@@ -172,17 +172,40 @@ export default function AnalyticsCharts() {
       return acc;
     }, {} as Record<string, number>);
     
-    const leadStatusColors = {
-      Hot: '#15803d', // Darker Green
-      Warm: '#b45309', // Darker Amber
-      Cold: '#b91c1c'  // Darker Red
+    // Define colors for lead status with index signature for TypeScript
+    const leadStatusColors: Record<string, string> = {
+      hot: '#15803d',    // Darker Green
+      warm: '#b45309',   // Darker Amber
+      cold: '#b91c1c',   // Darker Red
+      HOT: '#15803d',    // Uppercase variants
+      WARM: '#b45309',
+      COLD: '#b91c1c'
     };
     
-    const leadStatusDistribution = Object.entries(leadStatusCounts).map(([name, value]) => ({
-      name,
-      value,
-      color: leadStatusColors[name as keyof typeof leadStatusColors] || '#6B7280' // Gray default
-    }));
+    // Log for debugging
+    console.log('Lead status values in database:', Object.keys(leadStatusCounts));
+    
+    const leadStatusDistribution = Object.entries(leadStatusCounts).map(([name, value]) => {
+      // Normalize name to lowercase for matching
+      const normalizedName = name.toLowerCase();
+      let color = '#6B7280'; // Default gray
+      
+      // Check if we have a color for this status (direct or normalized)
+      if (name in leadStatusColors) {
+        color = leadStatusColors[name];
+      } else if (normalizedName in leadStatusColors) {
+        color = leadStatusColors[normalizedName];
+      }
+      
+      // Log for debugging
+      console.log(`Lead status: ${name}, Normalized: ${normalizedName}, Color: ${color}`);
+      
+      return {
+        name,
+        value,
+        color
+      };
+    });
     
     return {
       dailyChatCounts,
@@ -315,9 +338,10 @@ export default function AnalyticsCharts() {
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   paddingAngle={2}
                 >
-                  {analyticsData.leadStatusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
+                  {analyticsData.leadStatusDistribution.map((entry, index) => {
+                    console.log(`Rendering cell for ${entry.name} with color ${entry.color}`);
+                    return <Cell key={`cell-${index}`} fill={entry.color} />;
+                  })}
                 </Pie>
                 <Tooltip 
                   contentStyle={{ 
