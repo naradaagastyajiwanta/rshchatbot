@@ -13,8 +13,11 @@
     "@supabase/supabase-js": "^2.50.0",
     "@whiskeysockets/baileys": "^6.7.18",
     "axios": "^1.10.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "openai": "^5.5.1",
+    "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0"
   }
 }

@@ -167,7 +167,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col w-full h-full">
       {/* Chat header */}
       <div className="p-2 bg-gray-50 border-b flex items-center">
         <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
@@ -183,13 +183,13 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       
       {/* Chat messages area with WhatsApp-like background */}
       <div 
-        className="flex-1 p-3 overflow-y-auto" 
+        className="flex-1 flex flex-col w-full h-full p-6 overflow-y-auto" 
         style={{ 
           backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIZty4BjQAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y2NgGAVDA/z//z+Gof//EzTsP0kGMpBi2H8SDWQkxbD/JBrISIph/0k0cMiHIQDwKQoUJGILdQAAAABJRU5ErkJggg==')",
           backgroundRepeat: 'repeat',
         }}
       >
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 w-full">
           {messages.length === 0 ? (
             <div className="text-center text-gray-500 py-8 bg-white bg-opacity-80 rounded-lg shadow-sm">
               <svg className="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

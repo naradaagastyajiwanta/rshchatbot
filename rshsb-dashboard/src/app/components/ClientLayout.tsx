@@ -52,7 +52,12 @@ export default function ClientLayout({
                 <svg className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
-              ), delay: 0.8 }
+              ), delay: 0.8 },
+              { href: "/wa-connect", label: "WhatsApp Connect", icon: (
+                <svg className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+              ), delay: 0.9 }
             ].map((item, index) => (
               <motion.li 
                 key={index}
@@ -129,7 +134,7 @@ export default function ClientLayout({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="p-6 space-y-6 max-w-7xl mx-auto relative z-10"
+          className="p-6 space-y-6 w-full relative z-10"
         >
           <div className="relative">
             {children}

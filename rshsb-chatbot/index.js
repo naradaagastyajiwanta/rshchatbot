@@ -8,12 +8,29 @@ const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = requi
 const { Boom } = require('@hapi/boom');
 const fs = require('fs');
 const path = require('path');
-const qrcode = require('qrcode-terminal'); // Tambahkan modul qrcode-terminal
+const qrcodeTerminal = require('qrcode-terminal');
+const qrcode = require('qrcode');
+const express = require('express');
+const cors = require('cors');
 
 // Import our modules
 const { sendToChatbot } = require('./openai'); // Using updated openai.js with axios implementation
 const { logChat, getThreadId } = require('./supabase');
 const { processMessageForInsights } = require('./extractor');
+
+// Initialize Express server
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Variables to store the latest QR code and connection status
+let latestQr = null;
+let connectionStatus = {
+  state: 'disconnected', // 'disconnected', 'connecting', 'connected'
+  lastUpdated: new Date().toISOString(),
+  phoneNumber: null,
+  info: null
+};
 
 // Create auth directory if it doesn't exist
 const AUTH_FOLDER = path.join(__dirname, 'auth');
@@ -28,20 +45,37 @@ async function connectToWhatsApp() {
   
   // Create a new WhatsApp socket
   const sock = makeWASocket({
-    printQRInTerminal: true,
     auth: state,
     defaultQueryTimeoutMs: 60000, // 60 seconds timeout
   });
   
-  // Handle QR code generation
+  // Handle QR code generation and connection updates
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
     
-    // If QR code is received, display it in terminal
+    // If QR code is received, display it in terminal and store it for API
     if (qr) {
       console.log('\n==== Scan QR Code to connect to WhatsApp ====');
-      qrcode.generate(qr, { small: true });
+      qrcodeTerminal.generate(qr, { small: true });
       console.log('\nQR Code will expire in 20 seconds. Scan it quickly!');
+      
+      // Update connection status to connecting
+      connectionStatus = {
+        ...connectionStatus,
+        state: 'connecting',
+        lastUpdated: new Date().toISOString(),
+        info: 'QR Code generated, waiting for scan'
+      };
+      
+      // Generate QR code as data URI for API endpoint
+      qrcode.toDataURL(qr)
+        .then(url => {
+          latestQr = url;
+          console.log('QR Code generated and stored for API');
+        })
+        .catch(err => {
+          console.error('Error generating QR code:', err);
+        });
     }
     
     if (connection === 'close') {
@@ -50,12 +84,34 @@ async function connectToWhatsApp() {
       
       console.log('Connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
       
+      // Update connection status to disconnected
+      connectionStatus = {
+        ...connectionStatus,
+        state: 'disconnected',
+        lastUpdated: new Date().toISOString(),
+        info: `Disconnected: ${lastDisconnect.error?.message || 'Unknown error'}`
+      };
+      
+      // Reset QR code when disconnected
+      latestQr = null;
+      
       // Reconnect if not logged out
       if (shouldReconnect) {
         connectToWhatsApp();
       }
     } else if (connection === 'open') {
       console.log('Connection opened');
+      
+      // Update connection status to connected
+      connectionStatus = {
+        state: 'connected',
+        lastUpdated: new Date().toISOString(),
+        phoneNumber: sock.user?.id?.split(':')[0] || 'Unknown',
+        info: 'WhatsApp connected successfully'
+      };
+      
+      // Clear QR code when connected
+      latestQr = null;
     }
   });
   
@@ -126,6 +182,26 @@ async function connectToWhatsApp() {
   
   return sock;
 }
+
+// API endpoint to get the QR code
+app.get('/wa-qr', (req, res) => {
+  if (latestQr) {
+    res.json({ qr: latestQr });
+  } else {
+    res.status(404).json({ error: 'QR Code belum tersedia.' });
+  }
+});
+
+// API endpoint to get the connection status
+app.get('/wa-status', (req, res) => {
+  res.json(connectionStatus);
+});
+
+// Start the Express server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // Start the WhatsApp connection
 connectToWhatsApp().catch(err => console.error('Unexpected error:', err));

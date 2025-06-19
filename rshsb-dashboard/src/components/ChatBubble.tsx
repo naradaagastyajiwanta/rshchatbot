@@ -15,8 +15,8 @@ export default function ChatBubble({ message, direction, timestamp, waNumber }: 
   };
 
   return (
-    <div className={`flex ${direction === 'incoming' ? 'justify-start' : 'justify-end'}`}>
-      <div className={`max-w-xs md:max-w-sm lg:max-w-md`}>
+    <div className={`flex ${direction === 'incoming' ? 'justify-start' : 'justify-end'} w-full`}>
+      <div className={`max-w-md`}>
         <div
           className={`relative p-3 rounded-lg ${
             direction === 'incoming'
