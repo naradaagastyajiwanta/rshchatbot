@@ -6,16 +6,21 @@
 
 require('dotenv').config();
 const axios = require('axios');
+const { pollRunStatus } = require('./openai-utils');
 
-// API Key dari environment variable
-const apiKey = process.env.OPENAI_API_KEY;
+// Constants from environment variables
 const ASSISTANT_ID_CHATBOT = process.env.ASSISTANT_ID_CHATBOT;
 const ASSISTANT_ID_INSIGHT = process.env.ASSISTANT_ID_INSIGHT;
 
-// Headers untuk semua request
+if (!ASSISTANT_ID_CHATBOT || !ASSISTANT_ID_INSIGHT) {
+  console.error('Assistant IDs not found in environment variables');
+  process.exit(1);
+}
+
+// Headers for OpenAI API requests
 const headers = {
   'Content-Type': 'application/json',
-  'Authorization': `Bearer ${apiKey}`,
+  'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
   'OpenAI-Beta': 'assistants=v2'
 };
 
@@ -31,7 +36,8 @@ console.log('OpenAI client initialized with axios and assistants=v2 beta header'
 async function sendToChatbot(message, threadId = null, waNumber = null) {
   let createdThread = null;
   let runId = null;
-  const { getOrCreateChatbotThreadId } = require('./supabase');
+  const { getOrCreateChatbotThreadId, getUserProfile } = require('./supabase');
+  const supabase = require('./supabase').supabase;
   
   try {
     console.log(`DEBUG - Thread ID received: ${threadId}, Type: ${typeof threadId}, WA Number: ${waNumber}`);
@@ -42,6 +48,78 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
       if (profileThreadId) {
         threadId = profileThreadId;
         console.log(`Using thread ID from user_profiles: ${threadId}`);
+      }
+      
+      // IMPROVED CODE: Check for any active runs on this thread, regardless of which user started it
+      try {
+        // First check if there's an existing run_id in the user's profile
+        const userProfile = await getUserProfile(waNumber);
+        
+        if (userProfile && userProfile.run_id_chatbot) {
+          const existingRunId = userProfile.run_id_chatbot;
+          console.log(`Found existing run_id_chatbot: ${existingRunId} for user ${waNumber}`);
+          
+          try {
+            // Poll the existing run until it's no longer in progress or times out
+            console.log(`Polling existing run ${existingRunId} before creating a new one...`);
+            const runStatus = await pollRunStatus(threadId, existingRunId, 30);
+            
+            console.log(`Existing run completed with status: ${runStatus.status}`);
+            // Run is no longer active, we can proceed with creating a new run
+          } catch (pollError) {
+            console.error(`Error polling existing run: ${pollError.message}`);
+            // Continue with creating a new run even if polling failed
+          }
+        } else {
+          // Even if there's no run_id in the user profile, check for active runs on the thread
+          // This handles the case where another process started a run but hasn't updated the DB yet
+          try {
+            console.log(`Checking for any active runs on thread ${threadId}...`);
+            const runsResponse = await axios.get(
+              `https://api.openai.com/v1/threads/${threadId}/runs`,
+              { headers }
+            );
+            
+            const activeRuns = runsResponse.data.data.filter(run => 
+              ['queued', 'in_progress'].includes(run.status)
+            );
+            
+            if (activeRuns.length > 0) {
+              console.log(`Found ${activeRuns.length} active runs on thread ${threadId}`);
+              const latestRun = activeRuns[0]; // Get the most recent active run
+              
+              // Store this run ID in the user profile so other processes know about it
+              try {
+                const { error } = await supabase
+                  .from('user_profiles')
+                  .upsert({ 
+                    wa_number: waNumber,
+                    run_id_chatbot: latestRun.id,
+                    updated_at: new Date().toISOString()
+                  });
+                
+                if (!error) {
+                  console.log(`Updated user profile with active run ID: ${latestRun.id}`);
+                }
+              } catch (updateError) {
+                console.error(`Error updating run_id in profile: ${updateError.message}`);
+              }
+              
+              // Poll this run until it completes
+              console.log(`Polling active run ${latestRun.id} before creating a new one...`);
+              await pollRunStatus(threadId, latestRun.id, 30);
+              console.log(`Active run completed, can proceed with new message`);
+            } else {
+              console.log(`No active runs found on thread ${threadId}`);
+            }
+          } catch (runsError) {
+            console.error(`Error checking active runs: ${runsError.message}`);
+            // Continue even if checking for active runs failed
+          }
+        }
+      } catch (profileError) {
+        console.error(`Error checking user profile for existing run: ${profileError.message}`);
+        // Continue with creating a new run even if profile check failed
       }
     }
     
@@ -142,55 +220,175 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
       }
     }
     
-    // Add the message to the thread
-    console.log(`Adding message to thread ${threadId}...`);
-    await axios.post(
-      `https://api.openai.com/v1/threads/${threadId}/messages`,
-      {
-        role: 'user',
-        content: message
-      },
-      { headers }
-    );
+    // Add the message to the thread - with retry logic in case there's an active run
+    let messageAdded = false;
+    let retryAttempts = 0;
+    const maxRetries = 5;
     
-    // Run the assistant on the thread
-    console.log(`Creating run with chatbot assistant ${ASSISTANT_ID_CHATBOT}...`);
-    const runResponse = await axios.post(
-      `https://api.openai.com/v1/threads/${threadId}/runs`,
-      {
-        assistant_id: ASSISTANT_ID_CHATBOT
-      },
-      { headers }
-    );
-    
-    runId = runResponse.data.id;
-    console.log(`Created run ${runId} on thread ${threadId}`);
-    
-    // Wait for the run to complete
-    console.log('Waiting for run to complete...');
-    let runStatusResponse = await axios.get(
-      `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,
-      { headers }
-    );
-    let runStatus = runStatusResponse.data.status;
-    
-    // Poll for completion with timeout
-    let attempts = 0;
-    const maxAttempts = 30; // Maximum 30 seconds wait
-    
-    while (['queued', 'in_progress'].includes(runStatus) && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-      runStatusResponse = await axios.get(
-        `https://api.openai.com/v1/threads/${threadId}/runs/${runId}`,
-        { headers }
-      );
-      runStatus = runStatusResponse.data.status;
-      console.log('Run status:', runStatus);
-      attempts++;
+    while (!messageAdded && retryAttempts < maxRetries) {
+      try {
+        console.log(`Adding message to thread ${threadId}... (attempt ${retryAttempts + 1})`);
+        await axios.post(
+          `https://api.openai.com/v1/threads/${threadId}/messages`,
+          {
+            role: 'user',
+            content: message
+          },
+          { headers }
+        );
+        messageAdded = true;
+        console.log('Message added successfully');
+      } catch (messageError) {
+        if (messageError.response && 
+            messageError.response.data && 
+            messageError.response.data.error && 
+            messageError.response.data.error.message && 
+            messageError.response.data.error.message.includes('while a run')) {
+          
+          console.log(`Active run detected when adding message, waiting before retry...`);
+          
+          // Extract the run ID from the error message if possible
+          const runIdMatch = messageError.response.data.error.message.match(/run_(\w+)/);
+          if (runIdMatch && runIdMatch[0]) {
+            const activeRunId = runIdMatch[0];
+            console.log(`Detected active run ID from error: ${activeRunId}`);
+            
+            // Wait for this run to complete
+            try {
+              await pollRunStatus(threadId, activeRunId, 10); // Wait up to 10 seconds
+              console.log(`Finished waiting for active run ${activeRunId}`);
+            } catch (pollError) {
+              console.error(`Error polling active run: ${pollError.message}`);
+            }
+          } else {
+            // If we can't extract the run ID, just wait a few seconds
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          
+          retryAttempts++;
+        } else {
+          // If it's a different error, throw it
+          throw messageError;
+        }
+      }
     }
     
-    if (runStatus !== 'completed') {
-      throw new Error(`Run ended with status: ${runStatus}`);
+    if (!messageAdded) {
+      throw new Error(`Failed to add message after ${maxRetries} attempts due to active runs`);
+    }
+    
+    // Run the assistant on the thread - with retry logic
+    let runCreated = false;
+    retryAttempts = 0;
+    
+    while (!runCreated && retryAttempts < maxRetries) {
+      try {
+        console.log(`Creating run with chatbot assistant ${ASSISTANT_ID_CHATBOT}... (attempt ${retryAttempts + 1})`);
+        const runResponse = await axios.post(
+          `https://api.openai.com/v1/threads/${threadId}/runs`,
+          {
+            assistant_id: ASSISTANT_ID_CHATBOT
+          },
+          { headers }
+        );
+        
+        runId = runResponse.data.id;
+        runCreated = true;
+        console.log(`Created run ${runId} on thread ${threadId}`);
+      } catch (runError) {
+        if (runError.response && 
+            runError.response.data && 
+            runError.response.data.error && 
+            runError.response.data.error.message && 
+            runError.response.data.error.message.includes('already has an active run')) {
+          
+          console.log(`Thread already has an active run, waiting before retry...`);
+          
+          // Extract the run ID from the error message if possible
+          const runIdMatch = runError.response.data.error.message.match(/run_(\w+)/);
+          if (runIdMatch && runIdMatch[0]) {
+            const activeRunId = runIdMatch[0];
+            console.log(`Detected active run ID from error: ${activeRunId}`);
+            
+            // Wait for this run to complete
+            try {
+              await pollRunStatus(threadId, activeRunId, 10); // Wait up to 10 seconds
+              console.log(`Finished waiting for active run ${activeRunId}`);
+            } catch (pollError) {
+              console.error(`Error polling active run: ${pollError.message}`);
+            }
+          } else {
+            // If we can't extract the run ID, just wait a few seconds
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+          
+          retryAttempts++;
+        } else {
+          // If it's a different error, throw it
+          throw runError;
+        }
+      }
+    }
+    
+    if (!runCreated) {
+      throw new Error(`Failed to create run after ${maxRetries} attempts due to active runs`);
+    }
+    
+    // NEW CODE: Store the run_id in the user_profiles table
+    if (waNumber) {
+      try {
+        const { error } = await supabase
+          .from('user_profiles')
+          .upsert({ 
+            wa_number: waNumber,
+            run_id_chatbot: runId,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (error) {
+          console.error('Error updating run_id_chatbot in user_profiles:', error);
+        } else {
+          console.log(`Stored run_id_chatbot ${runId} for user ${waNumber}`);
+        }
+      } catch (updateError) {
+        console.error(`Error storing run_id: ${updateError.message}`);
+        // Continue even if storing the run_id failed
+      }
+    }
+    
+    // Wait for the run to complete using the utility function
+    console.log('Waiting for run to complete...');
+    try {
+      const runStatusData = await pollRunStatus(threadId, runId, 30);
+      
+      if (runStatusData.status !== 'completed') {
+        throw new Error(`Run ended with status: ${runStatusData.status}`);
+      }
+    } catch (pollError) {
+      console.error(`Error polling run status: ${pollError.message}`);
+      throw pollError; // Re-throw to be caught by the outer try-catch
+    } finally {
+      // NEW CODE: Clear the run_id from the database regardless of success/failure
+      if (waNumber) {
+        try {
+          const { error } = await supabase
+            .from('user_profiles')
+            .update({ 
+              run_id_chatbot: null,
+              updated_at: new Date().toISOString()
+            })
+            .eq('wa_number', waNumber);
+          
+          if (error) {
+            console.error('Error clearing run_id_chatbot in user_profiles:', error);
+          } else {
+            console.log(`Cleared run_id_chatbot for user ${waNumber}`);
+          }
+        } catch (clearError) {
+          console.error(`Error clearing run_id: ${clearError.message}`);
+          // Continue even if clearing the run_id failed
+        }
+      }
     }
     
     // Get the assistant's response
@@ -219,6 +417,26 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
     };
   } catch (error) {
     console.error('Error in sendToChatbot:', error.response ? error.response.data : error.message);
+    
+    // NEW CODE: Ensure run_id is cleared even if an error occurs
+    if (waNumber && runId) {
+      try {
+        const { error: clearError } = await supabase
+          .from('user_profiles')
+          .update({ 
+            run_id_chatbot: null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('wa_number', waNumber);
+        
+        if (clearError) {
+          console.error('Error clearing run_id_chatbot after error:', clearError);
+        }
+      } catch (clearError) {
+        console.error(`Error in error handler when clearing run_id: ${clearError.message}`);
+      }
+    }
+    
     // If there was an error, create a new thread for the next attempt
     return {
       response: 'Sorry, there was an error processing your message. Please try again.',
