@@ -28,6 +28,7 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
     const fetchMessages = async () => {
       try {
         setLoading(true);
+        console.log('Fetching initial messages...');
         
         let query = supabase
           .from('chat_logs')
@@ -46,6 +47,7 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
           throw error;
         }
         
+        console.log('Initial messages loaded:', data?.length || 0);
         setMessages(data || []);
         setTimeout(scrollToBottom, 100); // Scroll after messages load
       } catch (err) {
@@ -58,24 +60,34 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
 
     fetchMessages();
 
-    // Set up real-time subscription
-    const subscription = supabase
-      .channel('chat_logs_changes')
+    // Set up real-time subscription dengan logging dan error handling yang lebih baik
+    console.log('Setting up Supabase realtime subscription...');
+    
+    const channel = supabase.channel('chat_logs_changes');
+    
+    const subscription = channel
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
           table: 'chat_logs',
           filter: waNumber ? `wa_number=eq.${waNumber}` : undefined
         },
         (payload) => {
-          const newMessage = payload.new as ChatMessage;
-          setMessages((prevMessages) => [...prevMessages, newMessage]); // Add to end for chronological order
-          setTimeout(scrollToBottom, 100); // Scroll after new message
+          console.log('Realtime event received:', payload.eventType, payload);
+          
+          if (payload.eventType === 'INSERT') {
+            const newMessage = payload.new as ChatMessage;
+            console.log('New message received:', newMessage);
+            setMessages((prevMessages) => [...prevMessages, newMessage]); // Add to end for chronological order
+            setTimeout(scrollToBottom, 100); // Scroll after new message
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     // Clean up subscription
     return () => {
