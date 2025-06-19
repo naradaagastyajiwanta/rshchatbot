@@ -15,7 +15,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList
 } from 'recharts';
 
 interface ChatLog {
@@ -172,9 +173,9 @@ export default function AnalyticsCharts() {
     }, {} as Record<string, number>);
     
     const leadStatusColors = {
-      Hot: '#10B981', // Green
-      Warm: '#F59E0B', // Yellow
-      Cold: '#EF4444'  // Red
+      Hot: '#15803d', // Darker Green
+      Warm: '#b45309', // Darker Amber
+      Cold: '#b91c1c'  // Darker Red
     };
     
     const leadStatusDistribution = Object.entries(leadStatusCounts).map(([name, value]) => ({
@@ -248,6 +249,12 @@ export default function AnalyticsCharts() {
                 data={analyticsData.dailyChatCounts}
                 margin={{ top: 5, right: 30, left: 20, bottom: 25 }}
               >
+                <defs>
+                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8e003b" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#c32260" stopOpacity={0.3}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis 
                   dataKey="date" 
@@ -272,9 +279,10 @@ export default function AnalyticsCharts() {
                   dataKey="count"
                   name="Chat Messages"
                   stroke="#8e003b"
-                  activeDot={{ r: 8 }}
                   strokeWidth={2}
-                  dot={{ stroke: '#3B82F6', strokeWidth: 2, fill: '#fff', r: 4 }}
+                  activeDot={{ r: 8, fill: '#c32260', stroke: '#fff' }}
+                  dot={{ stroke: '#8e003b', strokeWidth: 2, fill: '#fff', r: 4 }}
+                  fill="url(#colorCount)"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -305,6 +313,7 @@ export default function AnalyticsCharts() {
                   dataKey="value"
                   nameKey="name"
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  paddingAngle={2}
                 >
                   {analyticsData.leadStatusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -367,9 +376,11 @@ export default function AnalyticsCharts() {
                 <Bar 
                   dataKey="count" 
                   name="Users" 
-                  fill="#8884d8" 
+                  fill="#c32260" 
                   radius={[0, 4, 4, 0]}
-                />
+                >
+                  <LabelList dataKey="count" position="right" fill="#8e003b" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -413,9 +424,11 @@ export default function AnalyticsCharts() {
                 <Bar 
                   dataKey="count" 
                   name="Users" 
-                  fill="#82ca9d" 
+                  fill="#f59e0b" 
                   radius={[0, 4, 4, 0]}
-                />
+                >
+                  <LabelList dataKey="count" position="right" fill="#b45309" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
