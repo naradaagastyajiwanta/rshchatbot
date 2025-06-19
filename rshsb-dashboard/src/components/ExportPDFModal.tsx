@@ -136,8 +136,12 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
           });
         }
 
-        // Create PDF document
-        const doc = new jsPDF();
+        // Create PDF document with landscape orientation
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
         
         // Add title
         doc.setFontSize(16);
@@ -172,21 +176,28 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
           { header: 'Keluhan', dataKey: 'keluhan' },
           { header: 'Barrier', dataKey: 'barrier' },
           { header: 'Lead Status', dataKey: 'lead_status' },
+          { header: 'Profile Link', dataKey: 'profile_link' },
         ];
         
-        // Format data for the table
-        const tableData = filteredData.map(user => ({
-          wa_number: user.wa_number || '',
-          name: user.name || '',
-          gender: user.gender || '',
-          age: user.age || '',
-          domisili: user.domisili || '',
-          keluhan: user.keluhan || '',
-          barrier: user.barrier || '',
-          lead_status: user.lead_status || '',
-        }));
+        // Format data for the table with wa.me links and profile links
+        const tableData = filteredData.map(user => {
+          const waNumber = user.wa_number?.replace(/^\+|\s+/g, '') || '';
+          const baseUrl = window.location.origin;
+          
+          return {
+            wa_number: waNumber ? `https://wa.me/${waNumber}` : '',
+            name: user.name || '',
+            gender: user.gender || '',
+            age: user.age || '',
+            domisili: user.domisili || '',
+            keluhan: user.keluhan || '',
+            barrier: user.barrier || '',
+            lead_status: user.lead_status || '',
+            profile_link: waNumber ? `${baseUrl}/user/${waNumber}` : '',
+          };
+        });
         
-        // Add the table to the PDF
+        // Add the table to the PDF with clickable links
         autoTable(doc, {
           startY: 45,
           head: [columns.map(col => col.header)],
@@ -200,6 +211,27 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
           styles: {
             fontSize: 8,
             cellPadding: 3,
+          },
+          didDrawCell: (data) => {
+            // Add clickable links for WA Number and Profile Link columns
+            if (data.section === 'body' && data.column.index === 0 && data.cell.raw) {
+              // WA Number column (index 0)
+              const url = data.cell.raw as string;
+              if (url && url.startsWith('https://')) {
+                doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url });
+              }
+            }
+            if (data.section === 'body' && data.column.index === 8 && data.cell.raw) {
+              // Profile Link column (index 8)
+              const url = data.cell.raw as string;
+              if (url && url.startsWith('http')) {
+                doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url });
+              }
+            }
+          },
+          columnStyles: {
+            wa_number: { textColor: [0, 0, 255] }, // Blue color for links
+            profile_link: { textColor: [0, 0, 255] }, // Blue color for links
           },
         });
         
@@ -218,8 +250,9 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black opacity-30" onClick={onClose}></div>
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
         <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-white to-[#f5e0e8]">
           <h2 className="text-xl font-bold text-[#8e003b]">Export User Data to PDF</h2>
           <button 
