@@ -265,12 +265,12 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
           </button>
         </div>
         
-        <div className="p-6 space-y-6">
-          <p className="text-gray-600">Select filters to apply before exporting user data to PDF.</p>
+        <div className="p-6 space-y-6 modal-filter-text">
+          <p className="text-gray-800 font-medium">Select filters to apply before exporting user data to PDF.</p>
           
           {/* Gender Filter */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Gender</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Gender</h3>
             <div className="flex space-x-4">
               <label className="inline-flex items-center">
                 <input
@@ -292,7 +292,7 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                   onChange={handleGenderChange}
                   className="form-radio h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                 />
-                <span className="ml-2 text-sm text-gray-700">Male</span>
+                <span className="ml-2 text-sm text-gray-900">Male</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -303,14 +303,14 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                   onChange={handleGenderChange}
                   className="form-radio h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                 />
-                <span className="ml-2 text-sm text-gray-700">Female</span>
+                <span className="ml-2 text-sm text-gray-900">Female</span>
               </label>
             </div>
           </div>
           
           {/* Age Range Filter */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Age Range</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Age Range</h3>
             <div className="flex space-x-4">
               <label className="inline-flex items-center">
                 <input
@@ -332,7 +332,7 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                   onChange={handleAgeRangeChange}
                   className="form-radio h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                 />
-                <span className="ml-2 text-sm text-gray-700">&lt;30</span>
+                <span className="ml-2 text-sm text-gray-900">&lt;30</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -343,7 +343,7 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                   onChange={handleAgeRangeChange}
                   className="form-radio h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                 />
-                <span className="ml-2 text-sm text-gray-700">30–50</span>
+                <span className="ml-2 text-sm text-gray-900">30–50</span>
               </label>
               <label className="inline-flex items-center">
                 <input
@@ -354,14 +354,14 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                   onChange={handleAgeRangeChange}
                   className="form-radio h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                 />
-                <span className="ml-2 text-sm text-gray-700">&gt;50</span>
+                <span className="ml-2 text-sm text-gray-900">&gt;50</span>
               </label>
             </div>
           </div>
           
           {/* Keluhan Filter (Multiselect) */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Keluhan (Health Complaints)</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Keluhan (Health Complaints)</h3>
             <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
               {filterOptions.keluhan.map((keluhan) => (
                 <label key={keluhan} className="inline-flex items-center">
@@ -371,18 +371,18 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
                     onChange={() => handleKeluhanChange(keluhan)}
                     className="form-checkbox h-4 w-4 text-[#8e003b] focus:ring-[#8e003b]"
                   />
-                  <span className="ml-2 text-sm text-gray-700">{keluhan}</span>
+                  <span className="ml-2 text-sm text-gray-900">{keluhan}</span>
                 </label>
               ))}
               {filterOptions.keluhan.length === 0 && (
-                <span className="text-sm text-gray-500 italic">No keluhan data available</span>
+                <span className="text-sm text-gray-700 italic">No keluhan data available</span>
               )}
             </div>
           </div>
           
           {/* Domisili Filter */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Domisili</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Domisili</h3>
             <select
               value={filters.domisili}
               onChange={handleDomisiliChange}
@@ -397,7 +397,7 @@ export default function ExportPDFModal({ isOpen, onClose, filterOptions }: Expor
           
           {/* Lead Status Filter */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Lead Status</h3>
+            <h3 className="text-sm font-medium text-gray-900 mb-2">Lead Status</h3>
             <div className="flex space-x-4">
               <label className="inline-flex items-center">
                 <input

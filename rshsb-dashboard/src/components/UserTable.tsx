@@ -190,10 +190,10 @@ export default function UserTable() {
       <div className="p-6 border-b border-[#e6c0cf] flex justify-between items-center bg-gradient-to-r from-white to-[#f5e0e8]">
         <div>
           <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profiles</h2>
-          <p className="text-sm text-gray-700 mt-1">{filteredUsers.length} users found</p>
+          <p className="text-sm text-gray-800 font-medium mt-1">{filteredUsers.length} users found</p>
         </div>
         <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-700 font-medium">
             Last updated: {new Date().toLocaleDateString()}
           </div>
           <button
@@ -211,7 +211,7 @@ export default function UserTable() {
       {/* improved UI: Modern filters with icons and better styling */}
       <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 bg-[#fdf7fa] border-b border-[#e6c0cf]">
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+          <label className="flex items-center text-sm font-medium text-gray-800 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
@@ -230,7 +230,7 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+          <label className="flex items-center text-sm font-medium text-gray-800 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
@@ -249,7 +249,7 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+          <label className="flex items-center text-sm font-medium text-gray-800 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -269,7 +269,7 @@ export default function UserTable() {
         </div>
         
         <div>
-          <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+          <label className="flex items-center text-sm font-medium text-gray-800 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
             </svg>
@@ -321,8 +321,8 @@ export default function UserTable() {
                     <svg className="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
-                    <p className="text-gray-500 font-medium">No users found matching the selected filters</p>
-                    <p className="text-gray-400 text-sm mt-1">Try adjusting your filter criteria</p>
+                    <p className="text-gray-700 font-medium">No users found matching the selected filters</p>
+                    <p className="text-gray-600 text-sm mt-1">Try adjusting your filter criteria</p>
                   </div>
                 </td>
               </tr>
@@ -341,7 +341,7 @@ export default function UserTable() {
                       <div className="font-medium text-gray-800 group-hover:text-[#8e003b] transition-colors">
                         {user.name || 'Unknown'}
                       </div>
-                      <div className="text-sm text-gray-500 group-hover:text-[#a5114c] transition-colors">
+                      <div className="text-sm text-gray-700 group-hover:text-[#a5114c] transition-colors">
                         {user.wa_number}
                       </div>
                     </Link>
@@ -367,8 +367,8 @@ export default function UserTable() {
                   </td>
                   <td className="px-6 py-4">
                     {user.domisili ? (
-                      <div className="flex items-center text-sm text-gray-700">
-                        <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <div className="flex items-center text-sm text-gray-800">
+                        <svg className="w-4 h-4 mr-1 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>

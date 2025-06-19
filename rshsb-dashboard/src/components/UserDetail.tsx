@@ -186,21 +186,21 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
-              Personal Information
+              <span className="font-bold">Personal Information</span>
             </h4>
             <div className="bg-gray-50 p-4 rounded-xl space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-xs font-medium text-gray-700 block mb-1">Age</span>
+                  <span className="text-xs font-medium text-gray-800 block mb-1">Age</span>
                   <p className="text-sm font-medium text-gray-900">{user.age || 'Not specified'}</p>
                 </div>
                 <div>
-                  <span className="text-xs font-medium text-gray-700 block mb-1">Gender</span>
+                  <span className="text-xs font-medium text-gray-800 block mb-1">Gender</span>
                   <p className="text-sm font-medium text-gray-900">{user.gender || 'Not specified'}</p>
                 </div>
               </div>
               <div>
-                <span className="text-xs font-medium text-gray-700 block mb-1">Domisili</span>
+                <span className="text-xs font-medium text-gray-800 block mb-1">Domisili</span>
                 <p className="text-sm font-medium text-gray-900">{user.domisili || 'Not specified'}</p>
               </div>
             </div>
@@ -210,7 +210,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
               </svg>
-              Health Information
+              <span className="font-bold">Health Information</span>
             </h4>
             <div className="space-y-3">
               <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
@@ -249,7 +249,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              Additional Information
+              <span className="font-bold">Additional Information</span>
             </h4>
             <div className="space-y-3">
               <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
