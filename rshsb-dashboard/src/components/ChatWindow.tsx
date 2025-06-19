@@ -169,7 +169,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   return (
     <div className="flex-1 flex flex-col">
       {/* Chat header */}
-      <div className="p-4 bg-gray-50 border-b flex items-center">
+      <div className="p-2 bg-gray-50 border-b flex items-center">
         <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
           {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : waNumber.charAt(0)}
         </div>
@@ -183,7 +183,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       
       {/* Chat messages area with WhatsApp-like background */}
       <div 
-        className="flex-1 p-6 overflow-y-auto" 
+        className="flex-1 p-3 overflow-y-auto" 
         style={{ 
           backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIZty4BjQAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y2NgGAVDA/z//z+Gof//EzTsP0kGMpBi2H8SDWQkxbD/JBrISIph/0k0cMiHIQDwKQoUJGILdQAAAABJRU5ErkJggg==')",
           backgroundRepeat: 'repeat',

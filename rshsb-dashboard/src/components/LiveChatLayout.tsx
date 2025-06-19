@@ -100,7 +100,7 @@ export default function LiveChatLayout() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-12rem)] bg-white rounded-xl shadow overflow-hidden">
+      <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
         <div className="flex justify-center items-center w-full">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-3"></div>
@@ -126,7 +126,7 @@ export default function LiveChatLayout() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-12rem)] bg-white rounded-xl shadow overflow-hidden">
+    <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
       <UserSidebar 
         users={users} 
         selectedUser={selectedUser} 

@@ -124,8 +124,8 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
   };
 
   return (
-    <div className="w-80 bg-white border-r shadow-sm flex flex-col">
-      <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+    <div className="w-72 bg-white border-r shadow-sm flex flex-col">
+      <div className="p-2 border-b border-gray-100 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
         <button 
           className="p-2 rounded-full hover:bg-gray-100 transition-colors"
