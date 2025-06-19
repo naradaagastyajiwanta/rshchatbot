@@ -1,4 +1,4 @@
-import ChatViewer from '../../components/ChatViewer';
+import LiveChatLayout from '../../components/LiveChatLayout';
 
 export default function DashboardPage() {
   return (
@@ -10,9 +10,7 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      <div className="bg-white rounded-lg shadow">
-        <ChatViewer />
-      </div>
+      <LiveChatLayout />
     </div>
   );
 }
