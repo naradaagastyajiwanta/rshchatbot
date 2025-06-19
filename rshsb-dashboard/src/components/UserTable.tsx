@@ -181,12 +181,12 @@ export default function UserTable() {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+    <div className="bg-gradient-to-br from-white to-[#fdf7fa] rounded-xl shadow-lg overflow-hidden border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
       {/* improved UI: Modern header with stats */}
-      <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+      <div className="p-6 border-b border-[#e6c0cf] flex justify-between items-center bg-gradient-to-r from-white to-[#f5e0e8]">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">User Profiles</h2>
-          <p className="text-sm text-gray-500 mt-1">{filteredUsers.length} users found</p>
+          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profiles</h2>
+          <p className="text-sm text-gray-700 mt-1">{filteredUsers.length} users found</p>
         </div>
         <div className="text-sm text-gray-500">
           Last updated: {new Date().toLocaleDateString()}
@@ -194,7 +194,7 @@ export default function UserTable() {
       </div>
       
       {/* improved UI: Modern filters with icons and better styling */}
-      <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 bg-gray-50 border-b">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 bg-[#fdf7fa] border-b border-[#e6c0cf]">
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -277,23 +277,23 @@ export default function UserTable() {
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
-            <tr className="bg-gray-50">
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            <tr className="bg-[#f5e0e8]">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 User
               </th>
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 Keluhan
               </th>
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 Barrier
               </th>
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 Domisili
               </th>
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 Lead Status
               </th>
-              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
                 Last Updated
               </th>
             </tr>
@@ -315,7 +315,7 @@ export default function UserTable() {
               filteredUsers.map((user, index) => (
                 <tr 
                   key={user.wa_number} 
-                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-[#f5e0e8] transition-colors duration-150`} 
+                  className={`${index % 2 === 0 ? 'bg-white' : 'bg-[#fdf7fa]'} hover:bg-[#f5e0e8] transition-all duration-300 border-b border-gray-100`} 
                   // improved UI: Zebra-striping for better readability
                 >
                   <td className="px-6 py-4">
@@ -333,14 +333,19 @@ export default function UserTable() {
                   </td>
                   <td className="px-6 py-4">
                     {user.keluhan ? (
-                      <div className="text-sm text-gray-700">{user.keluhan}</div>
+                      <div className="text-sm font-medium text-gray-900 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200">{user.keluhan}</div>
                     ) : (
                       <div className="text-sm text-gray-400 italic">Not specified</div>
                     )}
                   </td>
                   <td className="px-6 py-4">
                     {user.barrier ? (
-                      <div className="text-sm text-gray-700">{user.barrier}</div>
+                      <div className="bg-gradient-to-r from-amber-100 to-yellow-100 px-3 py-2 rounded-lg border border-amber-200 shadow-sm inline-flex items-center">
+                        <svg className="w-4 h-4 mr-1.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <span className="text-sm font-medium text-amber-800">{user.barrier}</span>
+                      </div>
                     ) : (
                       <div className="text-sm text-gray-400 italic">Not specified</div>
                     )}

@@ -137,7 +137,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
+      <div className="bg-gradient-to-br from-white to-[#fdf7fa] p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-[#8e003b]">Profile Information</h3>
           <span 
@@ -147,7 +147,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
           </span>
         </div>
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf]">
+          <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf] animate-pulse-slow">
             <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profile</h2>
             <Link href="/users" className="text-[#8e003b] hover:text-[#5e0027] flex items-center bg-white px-3 py-1 rounded-lg shadow-sm hover:shadow transition-all duration-200">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -188,17 +188,33 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               Health Information
             </h4>
             <div className="space-y-3">
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
-                <p className="text-xs text-[#8e003b] font-medium">Keluhan</p>
-                <p className="font-medium text-gray-900">{user.keluhan || 'Not specified'}</p>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
+                <div className="flex items-center mb-1">
+                  <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p className="text-sm text-[#8e003b] font-semibold">Keluhan</p>
+                </div>
+                <p className="font-medium text-gray-900 pl-5">{user.keluhan || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
-                <p className="text-xs text-[#8e003b] font-medium">Barrier</p>
-                <p className="font-medium text-gray-900">{user.barrier || 'Not specified'}</p>
+              <div className="bg-gradient-to-r from-amber-100 to-yellow-100 p-4 rounded-lg border border-amber-200 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-16 h-16 -mr-6 -mt-6 bg-gradient-to-br from-yellow-300 to-amber-500 rounded-full opacity-20"></div>
+                <div className="flex items-center mb-2">
+                  <svg className="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                  <p className="text-sm text-amber-700 font-semibold">Barrier</p>
+                </div>
+                <p className="font-medium text-gray-900 pl-7">{user.barrier || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
-                <p className="text-xs text-[#8e003b] font-medium">Urgency Level</p>
-                <p className="font-medium text-gray-900">{user.urgency_level || 'Not specified'}</p>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
+                <div className="flex items-center mb-1">
+                  <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p className="text-sm text-[#8e003b] font-semibold">Urgency Level</p>
+                </div>
+                <p className="font-medium text-gray-900 pl-5">{user.urgency_level || 'Not specified'}</p>
               </div>
             </div>
           </div>
@@ -211,13 +227,23 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               Additional Information
             </h4>
             <div className="space-y-3">
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
-                <p className="text-xs text-[#8e003b] font-medium">Program Awareness</p>
-                <p className="font-medium text-gray-900">{user.program_awareness || 'Not specified'}</p>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
+                <div className="flex items-center mb-1">
+                  <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <p className="text-sm text-[#8e003b] font-semibold">Program Awareness</p>
+                </div>
+                <p className="font-medium text-gray-900 pl-5">{user.program_awareness || 'Not specified'}</p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 hover:border-[#e6c0cf] transition-colors duration-200">
-                <p className="text-xs text-[#8e003b] font-medium">Last Updated</p>
-                <p className="font-medium text-gray-900">{user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}</p>
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-[#e6c0cf] transition-all duration-300">
+                <div className="flex items-center mb-1">
+                  <svg className="w-4 h-4 mr-1 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <p className="text-sm text-[#8e003b] font-semibold">Last Updated</p>
+                </div>
+                <p className="font-medium text-gray-900 pl-5">{user.last_updated ? new Date(user.last_updated).toLocaleString() : 'Unknown'}</p>
               </div>
             </div>
           </div>
