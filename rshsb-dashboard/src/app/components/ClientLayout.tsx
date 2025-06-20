@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { PageTitleProvider, usePageTitle } from '../../contexts/PageTitleContext';
+import { useLayout } from '../../contexts/layout-context';
 import { signOut } from '../../lib/authHelpers';
 
 // Wrapper component that uses the context
@@ -15,6 +16,8 @@ function ClientLayoutContent({
   // Use the page title context and router
   const { pageTitle } = usePageTitle();
   const router = useRouter();
+  // Use the layout context to determine if we're on mobile
+  const { isMobile, showSidebar, toggleSidebar } = useLayout();
   
   // Handle logout
   const handleLogout = async () => {
@@ -30,13 +33,35 @@ function ClientLayoutContent({
   };
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* improved UI: Ultra-modern sidebar with advanced gradient and enhanced styling */}
-      <motion.div 
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-64 bg-gradient-to-br from-white via-[#f5e0e8] to-[#e6c0cf] border-r border-[#e6c0cf] shadow-lg flex-shrink-0 fixed h-full z-20 backdrop-blur-sm"
-      >
+      {/* Mobile menu toggle button - only visible on mobile */}
+      {isMobile && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          onClick={toggleSidebar}
+          className="fixed top-4 left-4 z-50 bg-white p-2 rounded-full shadow-md border border-[#e6c0cf]"
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            {showSidebar ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </motion.button>
+      )}
+      
+      {/* Sidebar - conditionally rendered based on isMobile and showSidebar */}
+      {(!isMobile || (isMobile && showSidebar)) && (
+        <motion.div 
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className={`${isMobile ? 'w-full' : 'w-64'} bg-gradient-to-br from-white via-[#f5e0e8] to-[#e6c0cf] border-r border-[#e6c0cf] shadow-lg flex-shrink-0 fixed h-full z-20 backdrop-blur-sm`}
+        >
+
         <div className="p-5 border-b border-[#e6c0cf] bg-white bg-opacity-90 backdrop-blur-sm">
           <motion.h2 
             initial={{ y: -20, opacity: 0 }}
@@ -140,13 +165,14 @@ function ClientLayoutContent({
           </div>
         </motion.div>
       </motion.div>
+      )}
 
       {/* improved UI: Ultra-modern main content area with enhanced styling and animations */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex-1 overflow-auto ml-64 relative z-10"
+        className={`flex-1 overflow-auto ${(!isMobile || !showSidebar) ? (isMobile ? 'ml-0' : 'ml-64') : 'ml-0'} relative z-10`}
       >
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-[#f5e0e8] to-transparent opacity-40 pointer-events-none"></div>

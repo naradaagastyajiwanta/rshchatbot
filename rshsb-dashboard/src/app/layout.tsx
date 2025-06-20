@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 import ClientLayout from "./components/ClientLayout";
+import { LayoutProvider } from "../contexts/layout-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,9 @@ export default function RootLayout({
             color: '#fff',
           },
         }} />
-        {children}
+        <LayoutProvider>
+          {children}
+        </LayoutProvider>
       </body>
     </html>
   );
