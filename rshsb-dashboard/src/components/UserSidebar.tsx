@@ -157,7 +157,7 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
   }, [users, searchTerm, lastMessages]);
 
   return (
-    <div className="w-72 bg-white border-r shadow-sm flex flex-col">
+    <div className="w-full md:w-72 bg-white border-r shadow-sm flex flex-col">
       <div className="p-2 border-b border-gray-100 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
         <button 
