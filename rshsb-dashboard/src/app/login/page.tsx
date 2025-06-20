@@ -82,10 +82,19 @@ export default function LoginPage() {
       >
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6 sm:p-8">
-            <div className="flex justify-center mb-6">
+            <div className="flex flex-col items-center justify-center mb-6">
+              <div className="mb-4">
+                <Image 
+                  src="/images/logo-rsh.png" 
+                  alt="RSH Satubumi Logo" 
+                  width={80} 
+                  height={80} 
+                  className="rounded-full"
+                />
+              </div>
               <div className="text-center">
                 <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] via-[#a5114c] to-[#c32260] tracking-tight">
-                  RSH SB Dashboard
+                  Chatbot RSH
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
                   Rumah Sehat Holistik Satu Bumi
@@ -117,7 +126,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c32260] focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c32260] focus:border-transparent outline-none transition-all text-gray-900"
                   placeholder="nama@email.com"
                   required
                 />
@@ -132,7 +141,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c32260] focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#c32260] focus:border-transparent outline-none transition-all text-gray-900"
                   placeholder="••••••••"
                   required
                 />

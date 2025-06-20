@@ -86,7 +86,7 @@ function ClientLayoutContent({
                 transition={{ delay: 0.2, duration: 0.4 }}
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] via-[#a5114c] to-[#c32260] tracking-tight"
               >
-                RSH SB
+                Chatbot RSH
               </motion.h2>
               <motion.p 
                 initial={{ y: 10, opacity: 0 }}
