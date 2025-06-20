@@ -91,15 +91,16 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
     setSendingMessage(true);
     
     try {
-      // Get API key from env
+      // Get API key and URL from env
       const apiKey = process.env.NEXT_PUBLIC_API_KEY_SEND_MESSAGE;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       
       if (!apiKey) {
         throw new Error('API key not configured');
       }
       
       // Send message to backend
-      const response = await fetch('http://localhost:3001/api/send-message', {
+      const response = await fetch(`${apiUrl}/api/send-message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

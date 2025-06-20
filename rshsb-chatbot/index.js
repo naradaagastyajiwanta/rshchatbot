@@ -20,7 +20,13 @@ const { processMessageForInsights } = require('./extractor');
 
 // Initialize Express server
 const app = express();
-app.use(cors());
+
+// Configure CORS to allow requests from dashboard
+const corsOptions = {
+  origin: process.env.DASHBOARD_URL || 'http://localhost:3000',
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Variables to store the latest QR code and connection status

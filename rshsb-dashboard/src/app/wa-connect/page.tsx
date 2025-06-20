@@ -26,7 +26,8 @@ export default function WhatsAppConnectPage() {
       // Only fetch QR if not connected
       if (connectionStatus?.state !== 'connected') {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/wa-qr");
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/wa-qr`);
         
         if (!response.ok) {
           if (response.status !== 404) { // 404 is expected when already connected
@@ -50,7 +51,8 @@ export default function WhatsAppConnectPage() {
 
   const fetchConnectionStatus = async () => {
     try {
-      const response = await fetch("http://localhost:3001/wa-status");
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/wa-status`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

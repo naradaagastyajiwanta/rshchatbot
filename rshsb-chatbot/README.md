@@ -23,6 +23,7 @@ This project provides a WhatsApp bot backend that connects to WhatsApp using the
 3. OpenAI API key
 4. Supabase project with URL and API key
 5. OpenAI Assistant IDs for chatbot and insight extraction
+6. Dashboard URL for CORS configuration
 
 ### Deployment Steps
 
@@ -137,8 +138,20 @@ Create a `.env` file in the root directory with the following variables (see `.e
 - `ASSISTANT_ID_CHATBOT`: OpenAI Assistant ID for the chatbot
 - `ASSISTANT_ID_INSIGHT`: OpenAI Assistant ID for insight extraction
 - `API_KEY_SEND_MESSAGE`: Custom API key for authenticating API requests
-- `DASHBOARD_URL`: URL of the dashboard application
+- `DASHBOARD_URL`: URL of the dashboard application (e.g., https://your-dashboard.onrender.com)
 - `PORT`: Server port (default: 3000)
+
+## Frontend-Backend Integration
+
+To connect the dashboard frontend to this backend:
+
+1. Deploy both the backend and frontend to Render.com as separate services
+2. Set up the following environment variables in your frontend deployment:
+   - `NEXT_PUBLIC_API_URL`: The URL of this backend (e.g., https://your-backend.onrender.com)
+   - `NEXT_PUBLIC_API_KEY_SEND_MESSAGE`: Must match the `API_KEY_SEND_MESSAGE` value in the backend
+3. Set the `DASHBOARD_URL` in the backend to match your frontend URL for CORS
+
+See the `env.example` file in the dashboard project for reference.
 
 ## Local Development
 
