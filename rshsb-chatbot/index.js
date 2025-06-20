@@ -280,6 +280,11 @@ app.get('/wa-status', (req, res) => {
   res.json(connectionStatus);
 });
 
+// Simple ping endpoint for keep-alive cron job
+app.get('/ping', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Middleware to verify API key
 const verifyApiKey = (req, res, next) => {
   // Get the authorization header
