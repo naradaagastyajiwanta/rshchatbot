@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { PageTitleProvider, usePageTitle } from '../../contexts/PageTitleContext';
 import { useLayout } from '../../contexts/layout-context';
 import { signOut } from '../../lib/authHelpers';
@@ -63,22 +64,40 @@ function ClientLayoutContent({
         >
 
         <div className="p-5 border-b border-[#e6c0cf] bg-white bg-opacity-90 backdrop-blur-sm">
-          <motion.h2 
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] via-[#a5114c] to-[#c32260] tracking-tight"
-          >
-            RSH SB
-          </motion.h2>
-          <motion.p 
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-            className="text-xs text-gray-500 mt-1"
-          >
-            Healthcare Analytics Dashboard
-          </motion.p>
+          <div className="flex items-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="mr-3"
+            >
+              <Image 
+                src="/images/logo-rsh.png" 
+                alt="RSH Satubumi Logo" 
+                width={40} 
+                height={40} 
+                className="rounded-full"
+              />
+            </motion.div>
+            <div>
+              <motion.h2 
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+                className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] via-[#a5114c] to-[#c32260] tracking-tight"
+              >
+                RSH SB
+              </motion.h2>
+              <motion.p 
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+                className="text-xs text-gray-500 mt-1"
+              >
+                Healthcare Analytics Dashboard
+              </motion.p>
+            </div>
+          </div>
         </div>
         <nav className="mt-6 space-y-2 px-3">
           <ul className="space-y-3">
@@ -157,11 +176,22 @@ function ClientLayoutContent({
           
           <div className="text-xs relative">
             <div className="absolute -top-10 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent opacity-50"></div>
-            <p className="font-medium bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#a5114c]">Rumah Sehat Holistik</p>
-            <p className="mt-1 text-gray-500 flex items-center">
-              <span>Satu Bumi</span>
-              <span className="ml-2 inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            </p>
+            <div className="flex items-center">
+              <Image 
+                src="/images/logo-rsh.png" 
+                alt="RSH Satubumi Logo" 
+                width={20} 
+                height={20} 
+                className="rounded-full mr-2"
+              />
+              <div>
+                <p className="font-medium bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#a5114c]">Rumah Sehat Holistik</p>
+                <p className="mt-1 text-gray-500 flex items-center">
+                  <span>Satu Bumi</span>
+                  <span className="ml-2 inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </motion.div>
