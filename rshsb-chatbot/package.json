@@ -1,14 +1,18 @@
 {
   "name": "rshsb-chatbot",
   "version": "1.0.0",
+  "description": "WhatsApp Bot Backend using Baileys, OpenAI Assistant API, and Supabase",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["whatsapp", "bot", "openai", "supabase", "baileys"],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
     "@whiskeysockets/baileys": "^6.7.18",

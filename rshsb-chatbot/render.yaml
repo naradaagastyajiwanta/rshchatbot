@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: rshsb-chatbot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: ASSISTANT_ID_CHATBOT
+        sync: false
+      - key: ASSISTANT_ID_INSIGHT
+        sync: false
+      - key: API_KEY_SEND_MESSAGE
+        sync: false
+      - key: DASHBOARD_URL
+        sync: false
+    autoDeploy: true
