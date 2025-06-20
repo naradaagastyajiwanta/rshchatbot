@@ -130,7 +130,8 @@ async function notifyCSIfNeeded(userProfile, sock) {
       return false;
     }
     
-    // Prepare message
+    // Prepare message with dashboard link
+    const dashboardUrl = process.env.DASHBOARD_URL || 'http://localhost:3000';
     const message = `🔔 User tertarik untuk konsultasi:
 
 Nama: ${userProfile.name || 'Tidak diketahui'}
@@ -140,6 +141,8 @@ Nomor: wa.me/${userProfile.wa_number}
 Keluhan: ${userProfile.keluhan || 'Tidak diketahui'}
 
 Lead: HIGH
+
+Lihat profil lengkap: ${dashboardUrl}/user/${userProfile.wa_number}
 
 Segera hubungi untuk sesi call konsultasi 🙌`;
     

@@ -134,6 +134,7 @@ SUPABASE_KEY=your_supabase_key
 
 # API Configuration
 API_KEY_SEND_MESSAGE=your_api_key_for_message_sending
+DASHBOARD_URL=http://your-dashboard-url.com
 ```
 
 Catatan: `API_KEY_SEND_MESSAGE` harus sama dengan `NEXT_PUBLIC_API_KEY_SEND_MESSAGE` di file `.env.local` dashboard.
