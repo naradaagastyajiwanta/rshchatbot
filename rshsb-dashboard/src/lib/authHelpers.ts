@@ -15,7 +15,20 @@ export async function isAuthenticated(): Promise<boolean> {
 
 // Sign out the current user
 export async function signOut(): Promise<void> {
-  await supabase.auth.signOut();
+  console.log('Signing out user...');
+  const { error } = await supabase.auth.signOut();
+  
+  if (error) {
+    console.error('Error signing out:', error);
+    throw error;
+  }
+  
+  console.log('User signed out successfully');
+  // Hapus cookie secara manual untuk memastikan
+  document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'sb-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'supabase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 }
 
 // Get current user

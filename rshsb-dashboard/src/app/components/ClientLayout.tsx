@@ -19,8 +19,11 @@ function ClientLayoutContent({
   // Handle logout
   const handleLogout = async () => {
     try {
+      console.log('Logout button clicked');
       await signOut();
-      router.push('/login');
+      console.log('Redirecting to login page after logout');
+      // Gunakan hard redirect untuk memastikan semua state di-reset
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -111,7 +114,7 @@ function ClientLayoutContent({
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.4 }}
-          className="absolute bottom-0 w-full p-5 border-t border-[#e6c0cf] bg-gradient-to-r from-white to-[#f5e0e8] bg-opacity-90 backdrop-blur-sm"
+          className="absolute bottom-0 w-full p-5 border-t border-[#e6c0cf] bg-gradient-to-r from-white to-[#f5e0e8] bg-opacity-90 backdrop-blur-sm z-30"
         >
           {/* Logout button */}
           <motion.button
@@ -119,7 +122,7 @@ function ClientLayoutContent({
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.4 }}
-            className="w-full mb-4 py-2 px-4 flex items-center justify-center text-sm text-[#8e003b] bg-white rounded-lg border border-[#e6c0cf] hover:bg-[#f5e0e8] transition-colors duration-200 shadow-sm"
+            className="w-full mb-4 py-2 px-4 flex items-center justify-center text-sm text-[#8e003b] bg-white rounded-lg border border-[#e6c0cf] hover:bg-[#f5e0e8] transition-colors duration-200 shadow-sm relative z-40"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
