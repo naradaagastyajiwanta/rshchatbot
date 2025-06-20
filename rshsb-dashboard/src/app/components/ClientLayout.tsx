@@ -33,14 +33,14 @@ function ClientLayoutContent({
   };
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Mobile menu toggle button - only visible on mobile */}
+      {/* Mobile menu toggle button - only visible on mobile - positioned to avoid overlapping with titles */}
       {isMobile && (
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-50 bg-white p-2 rounded-full shadow-md border border-[#e6c0cf]"
+          className="fixed top-4 right-4 z-50 bg-white p-2 rounded-full shadow-md border border-[#e6c0cf]"
           aria-label="Toggle menu"
         >
           <svg className="w-6 h-6 text-[#8e003b]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
