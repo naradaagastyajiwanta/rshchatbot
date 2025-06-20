@@ -38,21 +38,38 @@ if (!fs.existsSync(AUTH_FOLDER)) {
   fs.mkdirSync(AUTH_FOLDER, { recursive: true });
 }
 
+// Track reconnection attempts
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_INTERVAL_BASE = 5000; // 5 seconds base, will be multiplied by attempt count
+
 // Function to start the WhatsApp connection
 async function connectToWhatsApp() {
-  // Use the saved authentication state
-  const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
-  
-  // Create a new WhatsApp socket
-  const sock = makeWASocket({
-    auth: state,
-    defaultQueryTimeoutMs: 60000, // 60 seconds timeout
-  });
-  
-  // Make the socket available globally for the notifier module
-  global.whatsappSock = sock;
-  
-  // Handle QR code generation and connection updates
+  try {
+    // Use the saved authentication state
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
+    
+    // Create a new WhatsApp socket
+    const sock = makeWASocket({
+      auth: state,
+      defaultQueryTimeoutMs: 60000, // 60 seconds timeout
+      printQRInTerminal: false, // We handle QR code display ourselves
+      connectTimeoutMs: 30000, // 30 seconds connection timeout
+      retryRequestDelayMs: 1000, // Retry delay for requests
+    });
+    
+    // Make the socket available globally for the notifier module
+    if (global.whatsappSock) {
+      // Clean up previous socket listeners if exists
+      try {
+        global.whatsappSock.ev.removeAllListeners();
+        console.log('Cleaned up previous socket listeners');
+      } catch (err) {
+        console.log('Error cleaning up previous socket:', err);
+      }
+    }
+    
+    global.whatsappSock = sock;
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
     
@@ -82,8 +99,16 @@ async function connectToWhatsApp() {
     }
     
     if (connection === 'close') {
-      const shouldReconnect = 
-        (lastDisconnect.error instanceof Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
+      // Get the status code from the error
+      const statusCode = (lastDisconnect.error instanceof Boom) ? 
+        lastDisconnect.error.output?.statusCode : 
+        0;
+      
+      // Get error reason if available
+      const errorReason = lastDisconnect.error?.data?.reason || '';
+      
+      // Determine if we should reconnect
+      let shouldReconnect = statusCode !== DisconnectReason.loggedOut;
       
       console.log('Connection closed due to ', lastDisconnect.error, ', reconnecting ', shouldReconnect);
       
@@ -98,9 +123,42 @@ async function connectToWhatsApp() {
       // Reset QR code when disconnected
       latestQr = null;
       
+      // Handle specific error cases
+      if (statusCode === 440) { // Stream error (conflict)
+        console.log('Detected connection conflict. Clearing auth state and waiting before reconnecting...');
+        await clearAuthState();
+        
+        // Wait longer for conflict errors
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        reconnectAttempts = 0; // Reset attempts after clearing auth
+      } else if (statusCode === 401 || errorReason === '401') { // Unauthorized
+        console.log('Detected unauthorized connection. Complete auth reset required.');
+        await clearAuthState(true); // Complete reset
+        
+        // Force a fresh login
+        shouldReconnect = true;
+        reconnectAttempts = 0;
+        
+        // Wait before reconnecting
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+      
       // Reconnect if not logged out
       if (shouldReconnect) {
-        connectToWhatsApp();
+        // Implement exponential backoff for reconnection
+        reconnectAttempts++;
+        
+        if (reconnectAttempts <= MAX_RECONNECT_ATTEMPTS) {
+          const delay = RECONNECT_INTERVAL_BASE * Math.pow(1.5, reconnectAttempts - 1);
+          console.log(`Attempting to reconnect in ${delay/1000} seconds (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+          
+          setTimeout(() => {
+            console.log(`Reconnecting now (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+            connectToWhatsApp();
+          }, delay);
+        } else {
+          console.log(`Maximum reconnection attempts (${MAX_RECONNECT_ATTEMPTS}) reached. Please restart the application manually.`);
+        }
       }
     } else if (connection === 'open') {
       console.log('Connection opened');
@@ -115,6 +173,9 @@ async function connectToWhatsApp() {
       
       // Clear QR code when connected
       latestQr = null;
+      
+      // Reset reconnection attempts on successful connection
+      reconnectAttempts = 0;
     }
   });
   
@@ -193,6 +254,10 @@ async function connectToWhatsApp() {
   });
   
   return sock;
+  } catch (err) {
+    console.error('Error in connectToWhatsApp:', err);
+    throw err; // Re-throw to be handled by the caller
+  }
 }
 
 // API endpoint to get the QR code
@@ -230,6 +295,45 @@ const verifyApiKey = (req, res, next) => {
   // If API key is valid, proceed to the next middleware/route handler
   next();
 };
+
+// API endpoint to force QR code regeneration
+app.post('/api/regenerate-qr', verifyApiKey, async (req, res) => {
+  try {
+    // Clear auth state to force new QR code generation
+    await clearAuthState(true);
+    
+    // Reset connection status
+    connectionStatus = {
+      state: 'disconnected',
+      lastUpdated: new Date().toISOString(),
+      phoneNumber: null,
+      info: 'Auth reset, waiting for QR code generation'
+    };
+    
+    // Reset QR code
+    latestQr = null;
+    
+    // Restart connection
+    if (global.whatsappSock) {
+      try {
+        global.whatsappSock.ev.removeAllListeners();
+        console.log('Cleaned up previous socket listeners');
+      } catch (err) {
+        console.log('Error cleaning up previous socket:', err);
+      }
+    }
+    
+    // Wait a moment before reconnecting
+    setTimeout(() => {
+      connectToWhatsApp().catch(err => console.error('Error reconnecting after QR regeneration:', err));
+    }, 2000);
+    
+    res.json({ success: true, message: 'Auth reset initiated, new QR code will be generated shortly' });
+  } catch (error) {
+    console.error('Error regenerating QR code:', error);
+    res.status(500).json({ error: 'Failed to regenerate QR code' });
+  }
+});
 
 // API endpoint to send WhatsApp message
 app.post('/api/send-message', verifyApiKey, async (req, res) => {
@@ -269,7 +373,71 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Start the WhatsApp connection
-connectToWhatsApp().catch(err => console.error('Unexpected error:', err));
+// Helper function to clear auth state
+async function clearAuthState(completeReset = false) {
+  try {
+    console.log(`Clearing auth state (completeReset: ${completeReset})`);
+    const authFiles = fs.readdirSync(AUTH_FOLDER);
+    
+    for (const file of authFiles) {
+      // If complete reset, delete all files
+      // Otherwise, only delete session and app-state files
+      if (completeReset || file.includes('session') || file.includes('app-state')) {
+        fs.unlinkSync(path.join(AUTH_FOLDER, file));
+        console.log(`Deleted auth file: ${file}`);
+      }
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Error clearing auth files:', err);
+    return false;
+  }
+}
+
+// Add a function to properly logout and clear credentials
+async function logoutWhatsApp() {
+  if (global.whatsappSock) {
+    try {
+      await global.whatsappSock.logout();
+      console.log('Logged out successfully');
+      
+      // Clear all auth files
+      await clearAuthState(true);
+      
+      // Update connection status
+      connectionStatus = {
+        state: 'disconnected',
+        lastUpdated: new Date().toISOString(),
+        phoneNumber: null,
+        info: 'Logged out manually'
+      };
+      
+      return { success: true, message: 'Logged out successfully' };
+    } catch (error) {
+      console.error('Error during logout:', error);
+      return { success: false, message: 'Error during logout: ' + error.message };
+    }
+  } else {
+    return { success: false, message: 'No active WhatsApp connection' };
+  }
+}
+
+// Add API endpoint for logout
+app.post('/api/logout', verifyApiKey, async (req, res) => {
+  const result = await logoutWhatsApp();
+  res.json(result);
+});
+
+// Start the WhatsApp connection with proper error handling
+connectToWhatsApp().catch(err => {
+  console.error('Unexpected error during connection:', err);
+  
+  // Set a timeout to retry initial connection
+  setTimeout(() => {
+    console.log('Retrying initial connection after error...');
+    connectToWhatsApp().catch(err => console.error('Retry failed:', err));
+  }, 5000);
+});
 
 console.log('RSH WhatsApp Chatbot is running...');
