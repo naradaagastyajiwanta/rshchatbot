@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, KeyboardEvent, ChangeEvent } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import ChatBubble from './ChatBubble';
 import useChatLogsRealtime from '../hooks/useChatLogsRealtime';
+import { toast } from 'react-hot-toast';
 
 interface ChatMessage {
   id: string;
@@ -33,14 +34,122 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   const [isBotActive, setIsBotActive] = useState<boolean>(true);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
+  const [inputMessage, setInputMessage] = useState<string>('');
+  const [textareaHeight, setTextareaHeight] = useState<string>('auto');
+  const [sendingMessage, setSendingMessage] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Use our custom hook for realtime updates
   const newMessages = useChatLogsRealtime(waNumber);
+  
+  // Reset newMessages when waNumber changes to avoid showing messages from previous user
+  useEffect(() => {
+    if (messages.length > 0) {
+      setMessages([]);
+    }
+  }, [waNumber]);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  // Handle input change and auto-grow textarea
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value);
+    
+    // Auto-grow textarea
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      setTextareaHeight(`${textareaRef.current.scrollHeight}px`);
+    }
+  };
+  
+  // Handle key press events (Enter to send, Shift+Enter for new line)
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+  
+  // Send message function
+  const handleSendMessage = async () => {
+    const trimmedMessage = inputMessage.trim();
+    
+    // Don't send empty messages
+    if (!trimmedMessage || !waNumber) return;
+    
+    // Validate wa_number
+    if (!waNumber.startsWith('62') || waNumber.length < 10) {
+      toast.error('Invalid WhatsApp number format');
+      return;
+    }
+    
+    setSendingMessage(true);
+    
+    try {
+      // Get API key from env
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY_SEND_MESSAGE;
+      
+      if (!apiKey) {
+        throw new Error('API key not configured');
+      }
+      
+      // Send message to backend
+      const response = await fetch('http://localhost:3001/api/send-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          wa_number: waNumber,
+          message: trimmedMessage
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+      
+      // Clear input after successful send
+      setInputMessage('');
+      setTextareaHeight('auto');
+      
+      // Optimistically add message to UI with a temporary ID
+      const tempId = `temp-${Date.now()}`;
+      const newMessage: ChatMessage = {
+        id: tempId, // Temporary ID with prefix for easy identification
+        wa_number: waNumber,
+        message: trimmedMessage,
+        direction: 'outgoing',
+        timestamp: new Date().toISOString(),
+        thread_id: '' // We don't have this info
+      };
+      
+      // Add to messages with temporary ID
+      setMessages(prev => [...prev, newMessage]);
+      
+      // Note: We're not inserting to Supabase directly from the frontend anymore
+      // This prevents duplicate entries since the backend will handle the insertion
+      
+      // Show success toast
+      toast.success('Message sent successfully');
+      
+      // Scroll to bottom
+      setTimeout(scrollToBottom, 100);
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to send message');
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   // Fetch user profile
@@ -140,15 +249,32 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   // Handle new messages from realtime subscription
   useEffect(() => {
     if (newMessages && newMessages.length > 0) {
-      setMessages(prevMessages => {
-        // Filter out duplicates
-        const newMessagesFiltered = newMessages.filter(
-          newMsg => !prevMessages.some(prevMsg => prevMsg.id === newMsg.id)
-        );
+      setMessages((prevMessages: ChatMessage[]) => {
+        // Create a new array to hold the updated messages
+        let updatedMessages = [...prevMessages];
         
-        if (newMessagesFiltered.length === 0) return prevMessages;
-        
-        const updatedMessages = [...prevMessages, ...newMessagesFiltered];
+        // Process each new message
+        for (const newMsg of newMessages) {
+          // Check if this is a message we sent (matches our temp messages by content and direction)
+          const tempMessageIndex = updatedMessages.findIndex(
+            msg => msg.id.startsWith('temp-') && 
+                  msg.message === newMsg.message && 
+                  msg.direction === newMsg.direction && 
+                  msg.wa_number === newMsg.wa_number
+          );
+          
+          if (tempMessageIndex >= 0) {
+            // Replace the temporary message with the real one
+            updatedMessages[tempMessageIndex] = newMsg;
+          } else {
+            // Check if this message already exists by ID
+            const existingIndex = updatedMessages.findIndex(msg => msg.id === newMsg.id);
+            if (existingIndex < 0) {
+              // This is a genuinely new message, add it
+              updatedMessages.push(newMsg);
+            }
+          }
+        }
         
         // Sort by timestamp
         updatedMessages.sort((a, b) => 
@@ -175,7 +301,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       </div>
     );
   }
-
+  
   if (loading) {
     return (
       <div className="flex-1 flex justify-center items-center p-6">
@@ -259,17 +385,45 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
               <p className="text-xs mt-1">Messages will appear here in real-time</p>
             </div>
           ) : (
-            messages.map((message) => (
+            messages.map((message: ChatMessage, index: number) => (
               <ChatBubble
-                key={message.id}
+                key={message.id || index}
                 message={message.message}
                 direction={message.direction}
                 timestamp={message.timestamp}
-                waNumber={message.direction === 'incoming' ? message.wa_number : undefined}
+                isLast={index === messages.length - 1}
               />
             ))
           )}
           <div ref={messagesEndRef} /> {/* Anchor for auto-scrolling */}
+        </div>
+      </div>
+      
+      {/* Chat input area */}
+      <div className="border-t bg-white p-3">
+        <div className="flex items-end space-x-2">
+          <div className="flex-1 min-h-[40px] rounded-lg border border-gray-300 overflow-hidden focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500">
+            <textarea
+              ref={textareaRef}
+              className="w-full px-3 py-2 outline-none resize-none min-h-[40px] max-h-[120px]"
+              placeholder="Type a message..."
+              rows={1}
+              value={inputMessage}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={sendingMessage}
+              style={{ height: textareaHeight }}
+            />
+          </div>
+          <button
+            className="bg-pink-600 hover:bg-pink-700 text-white rounded-full p-2 flex items-center justify-center h-10 w-10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim() || sendingMessage}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </div>

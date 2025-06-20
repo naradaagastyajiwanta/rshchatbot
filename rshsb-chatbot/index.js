@@ -209,6 +209,60 @@ app.get('/wa-status', (req, res) => {
   res.json(connectionStatus);
 });
 
+// Middleware to verify API key
+const verifyApiKey = (req, res, next) => {
+  // Get the authorization header
+  const authHeader = req.headers.authorization;
+  
+  // Check if the API key is provided and in correct format
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid authorization header' });
+  }
+  
+  // Extract the API key
+  const apiKey = authHeader.split(' ')[1];
+  
+  // Verify the API key against the environment variable
+  if (apiKey !== process.env.API_KEY_SEND_MESSAGE) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid API key' });
+  }
+  
+  // If API key is valid, proceed to the next middleware/route handler
+  next();
+};
+
+// API endpoint to send WhatsApp message
+app.post('/api/send-message', verifyApiKey, async (req, res) => {
+  try {
+    const { wa_number, message } = req.body;
+    
+    // Validate wa_number (must be string, start with 62, at least 10 digits)
+    if (!wa_number || typeof wa_number !== 'string' || !wa_number.startsWith('62') || wa_number.length < 10) {
+      return res.status(400).json({ error: 'Invalid wa_number: must be a string starting with 62 and at least 10 digits' });
+    }
+    
+    // Validate message (must be string, not empty, max 1000 characters)
+    if (!message || typeof message !== 'string' || message.length === 0 || message.length > 1000) {
+      return res.status(400).json({ error: 'Invalid message: must be a non-empty string with maximum 1000 characters' });
+    }
+    
+    // Send the message using the WhatsApp socket
+    await global.whatsappSock.sendMessage(wa_number + '@s.whatsapp.net', { text: message });
+    
+    // Log the outgoing message if logChat function is available
+    if (typeof logChat === 'function') {
+      await logChat(wa_number, message, 'outgoing', null);
+    }
+    
+    // Return success response
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    // Log the error server-side but don't expose details to client
+    console.error('Error sending WhatsApp message:', error);
+    return res.status(500).json({ error: 'Failed to send WhatsApp message' });
+  }
+});
+
 // Start the Express server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

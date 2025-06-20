@@ -5,6 +5,7 @@ interface ChatBubbleProps {
   direction: 'incoming' | 'outgoing';
   timestamp: string;
   waNumber?: string;
+  isLast?: boolean;
 }
 
 export default function ChatBubble({ message, direction, timestamp, waNumber }: ChatBubbleProps) {
