@@ -4,7 +4,8 @@
  */
 
 const { extractInsight } = require('./openai'); // Using updated openai.js with axios implementation
-const { updateUserProfile } = require('./supabase');
+const { updateUserProfile, getUserProfile } = require('./supabase');
+const { notifyCSIfNeeded } = require('./notifier');
 
 /**
  * Process a message to extract insights and update the user profile
@@ -31,6 +32,19 @@ async function processMessageForInsights(message, waNumber, threadId = null) {
       if (Object.keys(filteredInsights).length > 0) {
         console.log(`Updating user profile with insights: ${JSON.stringify(filteredInsights)}`);
         await updateUserProfile(waNumber, filteredInsights);
+        
+        // After updating the profile, check if CS notification is needed
+        // Get the updated user profile with all current data
+        const userProfile = await getUserProfile(waNumber);
+        if (userProfile) {
+          // Pass the global sock object to the notifier
+          // This will be available when called from index.js
+          if (global.whatsappSock) {
+            await notifyCSIfNeeded(userProfile, global.whatsappSock);
+          } else {
+            console.warn('WhatsApp socket not available for CS notification');
+          }
+        }
       }
     }
     

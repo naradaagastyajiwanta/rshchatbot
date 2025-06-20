@@ -49,6 +49,9 @@ async function connectToWhatsApp() {
     defaultQueryTimeoutMs: 60000, // 60 seconds timeout
   });
   
+  // Make the socket available globally for the notifier module
+  global.whatsappSock = sock;
+  
   // Handle QR code generation and connection updates
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
