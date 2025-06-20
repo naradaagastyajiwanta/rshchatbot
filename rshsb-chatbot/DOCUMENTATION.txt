@@ -1,7 +1,7 @@
 # RSH CHATBOT - DOKUMENTASI BACKEND
 
 ## DESKRIPSI UMUM
-RSH Chatbot adalah aplikasi chatbot WhatsApp yang terintegrasi dengan OpenAI Assistant API untuk memberikan respons cerdas kepada pengguna dan mengekstrak insight dari percakapan. Chatbot ini menggunakan model GPT-4o dan mengelola percakapan berthread melalui OpenAI Assistant API.
+RSH Chatbot adalah aplikasi chatbot WhatsApp yang terintegrasi dengan OpenAI Assistant API untuk memberikan respons cerdas kepada pengguna dan mengekstrak insight dari percakapan. Chatbot ini menggunakan model GPT-4o dan mengelola percakapan berthread melalui OpenAI Assistant API. Sistem ini juga menyediakan REST API untuk mengirim pesan WhatsApp langsung dari dashboard admin.
 
 ## ARSITEKTUR SISTEM
 Sistem terdiri dari beberapa komponen utama:
@@ -43,6 +43,56 @@ File ini menangani ekstraksi insight dari pesan pengguna. Komponen ini:
 - Memfilter nilai null dan string kosong
 - Memperbarui profil pengguna dengan insight yang valid
 
+## REST API ENDPOINT
+
+### POST /api/send-message
+Endpoint ini memungkinkan dashboard admin untuk mengirim pesan WhatsApp langsung ke pengguna.
+
+**Autentikasi:**
+- Header: `Authorization: Bearer <API_KEY_SEND_MESSAGE>`
+- API key harus cocok dengan nilai di variabel lingkungan `API_KEY_SEND_MESSAGE`
+
+**Request Body:**
+```json
+{
+  "wa_number": "628123456789",
+  "message": "Pesan yang akan dikirim"
+}
+```
+
+**Validasi:**
+- `wa_number`: String, harus diawali dengan "62" dan minimal 10 digit
+- `message`: String, tidak boleh kosong dan maksimal 1000 karakter
+
+**Response Success:**
+```json
+{
+  "success": true
+}
+```
+
+**Response Error:**
+```json
+{
+  "error": "Pesan error"
+}
+```
+
+**Contoh Penggunaan:**
+```javascript
+const response = await fetch('http://localhost:3001/api/send-message', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY_SEND_MESSAGE}`
+  },
+  body: JSON.stringify({
+    wa_number: '628123456789',
+    message: 'Halo, ini pesan dari admin dashboard'
+  })
+});
+```
+
 ## ALUR KERJA APLIKASI
 
 1. **Koneksi WhatsApp**:
@@ -81,7 +131,12 @@ ASSISTANT_ID_INSIGHT=your_insight_assistant_id
 # Supabase Configuration
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
+
+# API Configuration
+API_KEY_SEND_MESSAGE=your_api_key_for_message_sending
 ```
+
+Catatan: `API_KEY_SEND_MESSAGE` harus sama dengan `NEXT_PUBLIC_API_KEY_SEND_MESSAGE` di file `.env.local` dashboard.
 
 ## STRUKTUR DATABASE
 

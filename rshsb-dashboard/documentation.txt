@@ -3,7 +3,7 @@
 
 ## OVERVIEW
 -----------
-The RSHSB Dashboard is an administrative interface designed to monitor and analyze the performance of the Rumah Sehat Holistik Satu Bumi (RSH) WhatsApp chatbot. It provides real-time chat monitoring, user profile management, and analytics visualization to help administrators track and improve the chatbot's effectiveness.
+The RSHSB Dashboard is an administrative interface designed to monitor and analyze the performance of the Rumah Sehat Holistik Satu Bumi (RSH) WhatsApp chatbot. It provides real-time chat monitoring, user profile management, analytics visualization, and direct message sending capabilities to help administrators track, improve, and interact through the chatbot.
 
 ## TECHNICAL SPECIFICATIONS
 --------------------------
@@ -41,7 +41,10 @@ The RSHSB Dashboard is an administrative interface designed to monitor and analy
    ```
    NEXT_PUBLIC_SUPABASE_URL=https://kfrmnlscvejptimbehgb.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtmcm1ubHNjdmVqcHRpbWJlaGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMzMyMjAsImV4cCI6MjA2NTgwOTIyMH0.s-3sW0OPAv28VRAiA_gCqeu8uxXP2yDeMyeDyfB7Q0I
+   NEXT_PUBLIC_API_KEY_SEND_MESSAGE=your_api_key_for_sending_messages
    ```
+   
+   Note: The `NEXT_PUBLIC_API_KEY_SEND_MESSAGE` should match the `API_KEY_SEND_MESSAGE` in the backend `.env` file.
 
 4. Start the development server
    ```
@@ -102,10 +105,13 @@ The dashboard connects to a Supabase database with the following tables:
 ## FEATURES
 ----------
 
-### 1. Dashboard Page (/dashboard)
-The Dashboard page displays a real-time chat viewer that shows conversations between users and the chatbot. Key features include:
-- Real-time message updates
+### 1. Live Chat Monitoring
+- Real-time display of incoming and outgoing messages
+- Automatic updates via Supabase Realtime subscriptions
+- Message history for each user
 - Visual distinction between incoming and outgoing messages
+- Direct message sending capability from the admin dashboard
+- Message deduplication to prevent multiple entries of the same message
 - Timestamp display for each message
 - Automatic scrolling to latest messages
 - WhatsApp number identification
@@ -136,12 +142,20 @@ The User Detail page shows comprehensive information about a specific user. Key 
 ## COMPONENT DETAILS
 -------------------
 
-### ChatViewer Component
-- Subscribes to the `chat_logs` table in Supabase
-- Displays messages in a chat-like interface
-- Differentiates between incoming and outgoing messages
+### ChatWindow Component
+- Subscribes to the `chat_logs` table in Supabase for real-time updates
+- Displays messages in a WhatsApp-like interface with chat bubbles
+- Differentiates between incoming and outgoing messages with visual styling
 - Shows timestamps for each message
-- Can be filtered by WhatsApp number
+- Filters messages by WhatsApp number
+- Provides a message input area with auto-growing textarea
+- Supports sending messages directly to users via the backend API
+- Implements keyboard shortcuts (Enter to send, Shift+Enter for new line)
+- Shows loading state during message sending
+- Displays toast notifications for success/error feedback
+- Implements message deduplication to prevent multiple displays of the same message
+- Supports optimistic UI updates for immediate feedback
+- Reconciles temporary messages with real-time database updates
 
 ### UserTable Component
 - Fetches and displays user profiles from the `user_profiles` table
