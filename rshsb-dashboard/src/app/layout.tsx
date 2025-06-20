@@ -17,8 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RSH SB Dashboard",
+  title: "Chatbot RSH",
   description: "Admin dashboard for Rumah Sehat Holistik Satu Bumi WhatsApp Chatbot",
+  icons: {
+    icon: "/images/logo-rsh.png",
+    apple: "/images/logo-rsh.png",
+  },
 };
 
 export default function RootLayout({
