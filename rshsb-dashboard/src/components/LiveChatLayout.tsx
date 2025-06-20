@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import UserSidebar from './UserSidebar';
 import ChatWindow from './ChatWindow';
@@ -16,6 +16,7 @@ export default function LiveChatLayout() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -94,6 +95,24 @@ export default function LiveChatLayout() {
     };
   }, [selectedUser]);
 
+  // Effect untuk mendeteksi ukuran layar
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Cek ukuran layar saat komponen dimuat
+    checkIfMobile();
+    
+    // Tambahkan event listener untuk resize
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+
   const handleUserSelect = (waNumber: string) => {
     setSelectedUser(waNumber);
   };
@@ -126,13 +145,24 @@ export default function LiveChatLayout() {
   }
 
   return (
-    <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
-      <UserSidebar 
-        users={users} 
-        selectedUser={selectedUser} 
-        onSelectUser={handleUserSelect} 
-      />
-      <ChatWindow waNumber={selectedUser || ''} />
+    <div className="flex flex-col md:flex-row h-full bg-white rounded-lg shadow overflow-hidden">
+      {/* On mobile, show either sidebar or chat based on selection */}
+      <div className={`${selectedUser && isMobile ? 'hidden' : 'block'} w-full h-full md:block md:w-auto`}>
+        <UserSidebar 
+          users={users} 
+          selectedUser={selectedUser} 
+          onSelectUser={handleUserSelect} 
+        />
+      </div>
+      {/* Hanya tampilkan chat jika ada user yang dipilih atau di desktop */}
+      {(selectedUser || !isMobile) && (
+        <div className="w-full h-full flex-1">
+          <ChatWindow 
+            waNumber={selectedUser || ''} 
+            onBackToList={() => setSelectedUser(null)}
+          />
+        </div>
+      )}
     </div>
   );
 }

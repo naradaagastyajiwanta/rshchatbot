@@ -249,26 +249,26 @@ export default function AnalyticsCharts() {
 
   return (
     // improved UI: Modern analytics layout with enhanced visuals
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* improved UI: Analytics overview header with gradient */}
-      <div className="bg-gradient-to-r from-white to-[#f5e0e8] p-6 rounded-xl shadow-lg border border-[#e6c0cf]">
-        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">Dashboard Analytics</h2>
-        <p className="text-gray-600 mt-1">Real-time metrics and insights for Rumah Sehat Holistik</p>
+      <div className="bg-gradient-to-r from-white to-[#f5e0e8] p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf]">
+        <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">Dashboard Analytics</h2>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Real-time metrics and insights for Rumah Sehat Holistik</p>
       </div>
       
       {/* improved UI: Grid layout for charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Daily Chat Count Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-[#8e003b]">Daily Chat Volume</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#8e003b]">Daily Chat Volume</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium text-center">
               Last 7 days
             </span>
           </div>
           {/* improved UI: Small title for chart with enhanced styling */}
-          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Message volume trends over time</p>
-          <div className="h-80">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Message volume trends over time</p>
+          <div className="h-60 sm:h-80 overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={analyticsData.dailyChatCounts}
@@ -315,16 +315,16 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Lead Status Distribution Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-[#8e003b]">Lead Status Distribution</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#8e003b]">Lead Status Distribution</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium text-center">
               {analyticsData.leadStatusDistribution.reduce((sum, item) => sum + item.value, 0)} users
             </span>
           </div>
           {/* improved UI: Small title for chart with enhanced styling */}
-          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Breakdown of user lead qualification status</p>
-          <div className="h-80 flex items-center justify-center">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Breakdown of user lead qualification status</p>
+          <div className="h-60 sm:h-80 flex items-center justify-center overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -364,16 +364,16 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Top 5 Keluhan Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-[#8e003b]">Top 5 Keluhan</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#8e003b]">Top 5 Keluhan</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium text-center">
               Most common complaints
             </span>
           </div>
           {/* improved UI: Small title for chart with enhanced styling */}
-          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Most frequently reported health concerns</p>
-          <div className="h-80">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Most frequently reported health concerns</p>
+          <div className="h-60 sm:h-80 overflow-x-auto min-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={analyticsData.topKeluhan}
@@ -412,16 +412,16 @@ export default function AnalyticsCharts() {
         </div>
 
         {/* Top 5 Barrier Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-[#8e003b]">Top 5 Barrier</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-[#8e003b]">Top 5 Barrier</h3>
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium text-center">
               Common obstacles
             </span>
           </div>
           {/* improved UI: Small title for chart with enhanced styling */}
-          <p className="text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Key obstacles preventing users from seeking care</p>
-          <div className="h-80">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 mb-3 border-l-2 border-[#c32260] pl-2">Key obstacles preventing users from seeking care</p>
+          <div className="h-60 sm:h-80 overflow-x-auto min-w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={analyticsData.topBarrier}

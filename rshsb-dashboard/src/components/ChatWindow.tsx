@@ -24,9 +24,10 @@ interface UserProfile {
 
 interface ChatWindowProps {
   waNumber: string;
+  onBackToList?: () => void;
 }
 
-export default function ChatWindow({ waNumber }: ChatWindowProps) {
+export default function ChatWindow({ waNumber, onBackToList }: ChatWindowProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -333,6 +334,18 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       {/* Chat header */}
       <div className="p-2 bg-gray-50 border-b flex items-center justify-between">
         <div className="flex items-center">
+          {/* Back button for mobile */}
+          {onBackToList && (
+            <button 
+              onClick={onBackToList}
+              className="md:hidden mr-2 p-1 rounded-full hover:bg-gray-200 transition-colors"
+              aria-label="Back to user list"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+          )}
           <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3">
             {userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : waNumber.charAt(0)}
           </div>
@@ -401,12 +414,12 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       </div>
       
       {/* Chat input area */}
-      <div className="border-t bg-white p-3">
+      <div className="border-t bg-white p-2 sm:p-3 pb-safe">
         <div className="flex items-end space-x-2">
           <div className="flex-1 min-h-[40px] rounded-lg border border-gray-300 overflow-hidden focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500">
             <textarea
               ref={textareaRef}
-              className="w-full px-3 py-2 outline-none resize-none min-h-[40px] max-h-[120px]"
+              className="w-full px-2 sm:px-3 py-2 outline-none resize-none min-h-[40px] max-h-[120px] text-sm sm:text-base"
               placeholder="Type a message..."
               rows={1}
               value={inputMessage}

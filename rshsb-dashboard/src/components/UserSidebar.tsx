@@ -157,9 +157,9 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
   }, [users, searchTerm, lastMessages]);
 
   return (
-    <div className="w-72 bg-white border-r shadow-sm flex flex-col">
+    <div className="w-full md:w-72 bg-white border-r shadow-sm flex flex-col h-full md:h-auto">
       <div className="p-2 border-b border-gray-100 flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
+        <h2 className="text-base md:text-lg font-semibold text-gray-800">Chats</h2>
         <button 
           className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           onClick={() => window.location.reload()}
@@ -211,8 +211,8 @@ export default function UserSidebar({ users, selectedUser, onSelectUser }: UserS
                   className={`cursor-pointer hover:bg-gray-50 transition-colors ${selectedUser === user.wa_number ? 'bg-[#f5e0e8]' : ''}`}
                   onClick={() => onSelectUser(user.wa_number)}
                 >
-                  <div className="flex items-center p-4">
-                    <div className="relative h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-3 flex-shrink-0">
+                  <div className="flex items-center p-2 md:p-4">
+                    <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 mr-2 md:mr-3 flex-shrink-0">
                       {user.name ? user.name.charAt(0).toUpperCase() : user.wa_number.charAt(0)}
                       {/* 🟢 enhanced: status & search */}
                       <div className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-white ${isUserOnline(user.last_updated) ? 'bg-green-500' : 'bg-gray-400'}`}></div>

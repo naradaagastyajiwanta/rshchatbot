@@ -132,7 +132,7 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
     // improved UI: Modern WhatsApp-like chat interface
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       {/* Chat header */}
-      <div className="p-4 bg-gray-50 border-b flex items-center justify-between">
+      <div className="p-3 sm:p-4 bg-gray-50 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div className="flex items-center">
           <div className="h-10 w-10 rounded-full bg-[#f5e0e8] flex items-center justify-center text-[#8e003b] mr-3">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -148,14 +148,14 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
         </div>
         <div className="text-gray-400 text-xs">
           {messages.length > 0 && (
-            <span>Last message: {new Date(messages[messages.length - 1]?.timestamp).toLocaleDateString()}</span>
+            <span className="block truncate">Last: {new Date(messages[messages.length - 1]?.timestamp).toLocaleDateString()}</span>
           )}
         </div>
       </div>
       
       {/* Chat messages area with WhatsApp-like background */}
       <div 
-        className="p-4 h-[600px] overflow-y-auto" 
+        className="p-3 sm:p-4 h-[400px] sm:h-[500px] md:h-[600px] overflow-y-auto" 
         style={{ 
           backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIZty4BjQAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y2NgGAVDA/z//z+Gof//EzTsP0kGMpBi2H8SDWQkxbD/JBrISIph/0k0cMiHIQDwKQoUJGILdQAAAABJRU5ErkJggg==')",
           backgroundRepeat: 'repeat',
@@ -176,10 +176,10 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
                 key={message.id}
                 className={`flex ${message.direction === 'incoming' ? 'justify-start' : 'justify-end'}`}
               >
-                <div className={`max-w-[75%]`}>
+                <div className="max-w-[85%] sm:max-w-[75%]">
                   {/* improved UI: WhatsApp-like chat bubbles with tails */}
                   <div
-                    className={`relative p-3 rounded-lg ${message.direction === 'incoming'
+                    className={`relative p-2 sm:p-3 rounded-lg ${message.direction === 'incoming'
                       ? 'bg-white text-gray-800 rounded-tl-none shadow-sm'
                       : 'bg-green-500 text-white rounded-tr-none shadow-sm'
                     }`}
@@ -198,10 +198,10 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
                     ></div>
                     
                     {/* Message content */}
-                    <div className="whitespace-pre-wrap break-words">{message.message}</div>
+                    <div className="whitespace-pre-wrap break-words text-sm sm:text-base">{message.message}</div>
                     
                     {/* improved UI: Timestamp in bubble */}
-                    <div className={`text-xs mt-1 ${message.direction === 'incoming' ? 'text-gray-500' : 'text-green-100'} text-right`}>
+                    <div className={`text-[10px] sm:text-xs mt-1 ${message.direction === 'incoming' ? 'text-gray-500' : 'text-green-100'} text-right`}>
                       {formatTime(message.timestamp)}
                     </div>
                   </div>

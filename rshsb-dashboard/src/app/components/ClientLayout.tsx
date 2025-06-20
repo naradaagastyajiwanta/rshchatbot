@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { PageTitleProvider, usePageTitle } from '../../contexts/PageTitleContext';
 import { signOut } from '../../lib/authHelpers';
@@ -16,6 +16,64 @@ function ClientLayoutContent({
   const { pageTitle } = usePageTitle();
   const router = useRouter();
   
+  // State for mobile sidebar toggle
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Effect to handle window resize and set sidebar visibility based on screen size
+  useEffect(() => {
+    // Check if we're on desktop initially
+    const checkIfDesktop = () => {
+      // Set resizing flag to disable animations during resize
+      setIsResizing(true);
+      
+      const desktop = window.innerWidth >= 1024;
+      const wasDesktop = isDesktop;
+      
+      // Update desktop state
+      setIsDesktop(desktop);
+      
+      // If switching to desktop, ensure sidebar is visible
+      if (desktop && !sidebarOpen) {
+        setSidebarOpen(true);
+      }
+      
+      // If switching from desktop to mobile, hide sidebar
+      if (!desktop && wasDesktop) {
+        setSidebarOpen(false);
+      }
+      
+      // Reset resizing flag after a short delay
+      setTimeout(() => {
+        setIsResizing(false);
+      }, 100);
+    };
+    
+    // Run on mount
+    checkIfDesktop();
+    
+    // Add resize listener with debounce
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(checkIfDesktop, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, [sidebarOpen, isDesktop]);
+
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   // Handle logout
   const handleLogout = async () => {
     try {
@@ -29,13 +87,44 @@ function ClientLayoutContent({
     }
   };
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-gray-50">
+      {/* Hamburger menu for mobile */}
+      <button 
+        onClick={toggleSidebar}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white shadow-md text-[#8e003b] hover:bg-[#f5e0e8] transition-colors duration-200"
+        aria-label="Toggle menu"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}></path>
+        </svg>
+      </button>
+
+      {/* Overlay for mobile when sidebar is open */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black z-30 lg:hidden"
+            onClick={toggleSidebar}
+          />
+        )}
+      </AnimatePresence>
+
       {/* improved UI: Ultra-modern sidebar with advanced gradient and enhanced styling */}
       <motion.div 
         initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-64 bg-gradient-to-br from-white via-[#f5e0e8] to-[#e6c0cf] border-r border-[#e6c0cf] shadow-lg flex-shrink-0 fixed h-full z-20 backdrop-blur-sm"
+        animate={{ 
+          x: sidebarOpen || window.innerWidth >= 1024 ? 0 : -100, 
+          opacity: sidebarOpen || window.innerWidth >= 1024 ? 1 : 0 
+        }}
+        transition={{ 
+          duration: isResizing ? 0 : 0.4, 
+          ease: "easeOut" 
+        }}
+        className="w-64 bg-gradient-to-br from-white via-[#f5e0e8] to-[#e6c0cf] border-r border-[#e6c0cf] shadow-lg flex-shrink-0 fixed h-full z-40 backdrop-blur-sm lg:static lg:z-0"
       >
         <div className="p-5 border-b border-[#e6c0cf] bg-white bg-opacity-90 backdrop-blur-sm">
           <motion.h2 
@@ -146,7 +235,7 @@ function ClientLayoutContent({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex-1 overflow-auto ml-64 relative z-10"
+        className="flex-1 overflow-auto relative z-10"
       >
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-full h-64 bg-gradient-to-b from-[#f5e0e8] to-transparent opacity-40 pointer-events-none"></div>
@@ -158,11 +247,11 @@ function ClientLayoutContent({
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="bg-white bg-opacity-90 backdrop-blur-sm border-b border-[#e6c0cf] shadow-md p-5 sticky top-0 z-30"
+          className="bg-white bg-opacity-90 backdrop-blur-sm border-b border-[#e6c0cf] shadow-md p-5 pl-16 lg:pl-5 sticky top-0 z-30"
         >
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">{pageTitle}</h1>
-            <div className="text-sm bg-gradient-to-r from-[#8e003b] to-[#a5114c] px-4 py-1.5 rounded-full text-white font-medium shadow-md flex items-center space-x-1">
+          <div className="flex justify-between items-center flex-wrap gap-2">
+            <h1 className="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">{pageTitle}</h1>
+            <div className="text-xs sm:text-sm bg-gradient-to-r from-[#8e003b] to-[#a5114c] px-3 sm:px-4 py-1.5 rounded-full text-white font-medium shadow-md flex items-center space-x-1">
               <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse mr-2"></span>
               <span>Admin Dashboard</span>
             </div>
@@ -174,7 +263,7 @@ function ClientLayoutContent({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="p-6 space-y-6 w-full relative z-10"
+          className="p-6 space-y-6 w-full relative z-10 pb-24"
         >
           <div className="relative">
             {children}

@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
 export async function middleware(request: NextRequest) {
-  // Initialize Supabase client using environment variables
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://kfrmnlscvejptimbehgb.supabase.co';
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtmcm1ubHNjdmVqcHRpbWJlaGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyMzMyMjAsImV4cCI6MjA2NTgwOTIyMH0.s-3sW0OPAv28VRAiA_gCqeu8uxXP2yDeMyeDyfB7Q0I';
-  
   // Get the pathname of the request
   const path = request.nextUrl.pathname;
+  const searchParams = request.nextUrl.searchParams;
+  
+  // Check for redirect_count to prevent infinite loops
+  const redirectCount = parseInt(searchParams.get('redirect_count') || '0');
+  if (redirectCount > 2) {
+    console.log('Middleware: Detected redirect loop, allowing request to continue');
+    return NextResponse.next();
+  }
   
   // Public paths that don't require authentication
   const isPublicPath = path === '/login';
@@ -22,15 +25,21 @@ export async function middleware(request: NextRequest) {
   // Check if the user has any of the authentication cookies
   const hasAuthCookies = !!(refreshToken || accessToken || authToken || supabaseAuthToken);
   
+  console.log(`Middleware: Path=${path}, HasAuth=${hasAuthCookies}, IsPublic=${isPublicPath}`);
+  
   if (!hasAuthCookies && !isPublicPath) {
     // If user is not authenticated and trying to access a protected route, redirect to login
+    console.log('Middleware: Redirecting to login');
     const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('redirect_count', (redirectCount + 1).toString());
     return NextResponse.redirect(redirectUrl);
   }
   
   if (hasAuthCookies && isPublicPath) {
     // If user is authenticated and trying to access login page, redirect to dashboard
+    console.log('Middleware: Redirecting to dashboard');
     const redirectUrl = new URL('/dashboard', request.url);
+    redirectUrl.searchParams.set('redirect_count', (redirectCount + 1).toString());
     return NextResponse.redirect(redirectUrl);
   }
   

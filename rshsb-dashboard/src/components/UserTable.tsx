@@ -187,18 +187,18 @@ export default function UserTable() {
   return (
     <div className="bg-gradient-to-br from-white to-[#fdf7fa] rounded-xl shadow-lg overflow-hidden border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
       {/* improved UI: Modern header with stats */}
-      <div className="p-6 border-b border-[#e6c0cf] flex justify-between items-center bg-gradient-to-r from-white to-[#f5e0e8]">
+      <div className="p-4 sm:p-6 border-b border-[#e6c0cf] flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-gradient-to-r from-white to-[#f5e0e8]">
         <div>
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profiles</h2>
+          <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profiles</h2>
           <p className="text-sm text-gray-800 font-medium mt-1">{filteredUsers.length} users found</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-700 font-medium">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+          <div className="text-xs sm:text-sm text-gray-700 font-medium">
             Last updated: {new Date().toLocaleDateString()}
           </div>
           <button
             onClick={() => setIsExportModalOpen(true)}
-            className="px-3 py-1.5 bg-[#8e003b] text-white rounded-md text-sm font-medium hover:bg-[#6d002d] transition-colors flex items-center"
+            className="w-full sm:w-auto px-3 py-1.5 bg-[#8e003b] text-white rounded-md text-sm font-medium hover:bg-[#6d002d] transition-colors flex items-center justify-center sm:justify-start"
           >
             <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -209,7 +209,7 @@ export default function UserTable() {
       </div>
       
       {/* improved UI: Modern filters with icons and better styling */}
-      <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-6 bg-[#fdf7fa] border-b border-[#e6c0cf]">
+      <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 bg-[#fdf7fa] border-b border-[#e6c0cf]">
         <div>
           <label className="flex items-center text-sm font-medium text-gray-800 mb-2">
             <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -290,7 +290,7 @@ export default function UserTable() {
       
       {/* improved UI: Modern table with zebra-striping */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-gray-200 table-fixed md:table-auto">
           <thead>
             <tr className="bg-[#f5e0e8]">
               <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-[#8e003b] uppercase tracking-wider">
@@ -424,20 +424,20 @@ export default function UserTable() {
       </div>
       
       {/* improved UI: Pagination placeholder */}
-      <div className="bg-white px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <div className="text-sm text-gray-500">
+      <div className="bg-white px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="text-xs sm:text-sm text-gray-500 w-full sm:w-auto text-center sm:text-left">
           Showing <span className="font-medium">{filteredUsers.length}</span> users
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 w-full sm:w-auto justify-center">
           <button 
             disabled 
-            className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+            className="px-3 py-1 border border-gray-300 rounded-md text-xs sm:text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
           >
             Previous
           </button>
           <button 
             disabled 
-            className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
+            className="px-3 py-1 border border-gray-300 rounded-md text-xs sm:text-sm text-gray-500 bg-gray-50 cursor-not-allowed"
           >
             Next
           </button>

@@ -180,7 +180,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
       {/* Toast notification */}
       {showToast && toastMessage && (
         <div className="fixed top-4 right-4 bg-white shadow-lg rounded-lg p-4 z-50 border-l-4 border-[#8e003b] animate-fade-in-out">
@@ -194,7 +194,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
       )}
       
       <div className="bg-gradient-to-br from-white to-[#fdf7fa] p-6 rounded-xl shadow-lg border border-[#e6c0cf] hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
           <h3 className="text-lg font-bold text-[#8e003b]">Profile Information</h3>
           <div className="flex items-center space-x-3">
             <ResetThreadButton 
@@ -257,9 +257,9 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
           </p>
         </div>
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-4 rounded-xl shadow-md border border-[#e6c0cf] animate-pulse-slow">
-            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profile</h2>
-            <Link href="/users" className="text-[#8e003b] hover:text-[#5e0027] flex items-center bg-white px-3 py-1 rounded-lg shadow-sm hover:shadow transition-all duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gradient-to-r from-white to-[#f5e0e8] p-3 sm:p-4 rounded-xl shadow-md border border-[#e6c0cf] animate-pulse-slow gap-3">
+            <h2 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#8e003b] to-[#c32260]">User Profile</h2>
+            <Link href="/users" className="text-[#8e003b] hover:text-[#5e0027] flex items-center justify-center bg-white px-3 py-1 rounded-lg shadow-sm hover:shadow transition-all duration-200 w-full sm:w-auto">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
@@ -274,7 +274,7 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
               <span className="font-bold">Personal Information</span>
             </h4>
             <div className="bg-gray-50 p-4 rounded-xl space-y-3">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <span className="text-xs font-medium text-gray-800 block mb-1">Age</span>
                   <p className="text-sm font-medium text-gray-900">{user.age || 'Not specified'}</p>
@@ -362,10 +362,10 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
       
       {/* Right Column: Chat History */}
       <div className="lg:col-span-2">
-        <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] h-full hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-[#e6c0cf] h-full hover:shadow-xl transition-all duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
             <h3 className="text-lg font-bold text-[#8e003b]">Chat History</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium text-center">
               Conversation
             </span>
           </div>
