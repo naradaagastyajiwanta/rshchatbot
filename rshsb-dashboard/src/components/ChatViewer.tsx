@@ -33,8 +33,8 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
         let query = supabase
           .from('chat_logs')
           .select('*')
-          .order('timestamp', { ascending: true }) // Changed to ascending for chronological order
-          .limit(50);
+          .order('timestamp', { ascending: false }) // Changed to ascending for chronological order
+          .limit(500);
         
         // If waNumber is provided, filter by that number
         if (waNumber) {
