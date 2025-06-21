@@ -227,8 +227,8 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
           .from('chat_logs')
           .select('*')
           .eq('wa_number', waNumber)
-          .order('timestamp', { ascending: true })
-          .limit(50);
+          .order('timestamp', { ascending: false })
+          .limit(500);
         
         if (error) {
           throw error;
