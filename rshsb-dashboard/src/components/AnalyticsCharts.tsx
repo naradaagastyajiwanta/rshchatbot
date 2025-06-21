@@ -174,20 +174,24 @@ export default function AnalyticsCharts() {
     
     // Define colors for lead status values in the database
     const leadStatusColors: Record<string, string> = {
-      // Actual values from database
-      low: '#b91c1c',     // Red - Cold lead
-      medium: '#b45309',  // Amber - Warm lead
-      high: '#15803d',    // Green - Hot lead
+      // Actual values from database - 5 levels
+      very_low: '#dc2626',   // Bright Red - Very Cold lead
+      low: '#ef4444',        // Red - Cold lead
+      medium: '#f59e0b',     // Amber - Warm lead
+      high: '#65a30d',       // Light Green - Hot lead
+      very_high: '#16a34a',  // Green - Very Hot lead
       
       // Fallback values (case-insensitive)
-      Low: '#b91c1c',
-      Medium: '#b45309',
-      High: '#15803d',
+      'Very Low': '#dc2626',
+      'Low': '#ef4444',
+      'Medium': '#f59e0b',
+      'High': '#65a30d',
+      'Very High': '#16a34a',
       
       // Legacy values if present
-      cold: '#b91c1c',
-      warm: '#b45309',
-      hot: '#15803d'
+      cold: '#ef4444',
+      warm: '#f59e0b',
+      hot: '#65a30d'
     };
     
     const leadStatusDistribution = Object.entries(leadStatusCounts).map(([name, value]) => {

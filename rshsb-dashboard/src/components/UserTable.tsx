@@ -12,7 +12,7 @@ interface UserProfile {
   domisili: string;
   keluhan: string;
   barrier: string;
-  lead_status: 'Cold' | 'Warm' | 'Hot';
+  lead_status: 'very_low' | 'low' | 'medium' | 'high' | 'very_high' | 'Cold' | 'Warm' | 'Hot';
   last_updated: string;
   age: number;
   symptoms: string;
@@ -43,7 +43,7 @@ export default function UserTable() {
     keluhan: [] as string[],
     barrier: [] as string[],
     domisili: [] as string[],
-    lead_status: ['Cold', 'Warm', 'Hot']
+    lead_status: ['very_low', 'low', 'medium', 'high', 'very_high', 'Cold', 'Warm', 'Hot']
   });
 
   useEffect(() => {
@@ -379,7 +379,38 @@ export default function UserTable() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {/* improved UI: Better lead status badges with updated colors */}
+                    {/* improved UI: Better lead status badges with updated colors for 5 levels */}
+                    {user.lead_status === 'very_high' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                        <span className="w-2 h-2 bg-green-600 rounded-full mr-1.5"></span>
+                        Very High
+                      </span>
+                    )}
+                    {user.lead_status === 'high' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
+                        <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
+                        High
+                      </span>
+                    )}
+                    {user.lead_status === 'medium' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">
+                        <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1.5"></span>
+                        Medium
+                      </span>
+                    )}
+                    {user.lead_status === 'low' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                        <span className="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span>
+                        Low
+                      </span>
+                    )}
+                    {user.lead_status === 'very_low' && (
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                        <span className="w-2 h-2 bg-red-600 rounded-full mr-1.5"></span>
+                        Very Low
+                      </span>
+                    )}
+                    {/* Legacy support */}
                     {user.lead_status === 'Hot' && (
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
                         <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
@@ -399,8 +430,9 @@ export default function UserTable() {
                       </span>
                     )}
                     {!user.lead_status && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
-                        Unknown
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
+                        Not Set
                       </span>
                     )}
                   </td>
