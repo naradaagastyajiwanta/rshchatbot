@@ -4,6 +4,18 @@
  * to ensure proper header inclusion and reliable thread ID handling
  */
 
+/**
+ * Clean Assistant response by removing citation patterns and excessive whitespace
+ * @param {string} text - The text to clean
+ * @returns {string} - The cleaned text
+ */
+function cleanAssistantResponse(text) {
+  return text
+    .replace(/【\d+:\d+†[^】]+】/g, '') // Remove citation patterns like 【1:2†...】
+    .replace(/\n{2,}/g, '\n')          // Replace multiple newlines with a single one
+    .trim();                           // Remove leading/trailing whitespace
+}
+
 require('dotenv').config();
 const axios = require('axios');
 const { pollRunStatus } = require('./openai-utils');
@@ -811,5 +823,6 @@ async function extractInsight(message, threadId = null, waNumber = null) {
 
 module.exports = {
   sendToChatbot,
-  extractInsight
+  extractInsight,
+  cleanAssistantResponse
 };

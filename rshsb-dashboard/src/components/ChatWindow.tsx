@@ -234,7 +234,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
           throw error;
         }
         
-        setMessages(data || []);
+        setMessages((data || []).reverse());
         setTimeout(scrollToBottom, 100); // Scroll after messages load
       } catch (err) {
         console.error('Error fetching messages:', err);

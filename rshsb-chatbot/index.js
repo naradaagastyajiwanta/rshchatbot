@@ -14,7 +14,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Import our modules
-const { sendToChatbot } = require('./openai'); // Using updated openai.js with axios implementation
+const { sendToChatbot, cleanAssistantResponse } = require('./openai'); // Using updated openai.js with axios implementation
 const { logChat, getThreadId, getUserProfile } = require('./supabase');
 const { processMessageForInsights } = require('./extractor');
 
@@ -232,8 +232,11 @@ async function connectToWhatsApp() {
         console.log(`Sending message to OpenAI Assistant with thread ID: ${threadId || 'new'} for ${waNumber}`);
         const assistantResponse = await sendToChatbot(messageContent, threadId, waNumber);
         
-        // Send the response back to the user
-        await sock.sendMessage(chatId, { text: assistantResponse.response });
+        // Clean the response before sending it to the user
+        const cleanedResponse = cleanAssistantResponse(assistantResponse.response);
+        
+        // Send the cleaned response back to the user
+        await sock.sendMessage(chatId, { text: cleanedResponse });
         
         // Log the outgoing message
         await logChat(waNumber, assistantResponse.response, 'outgoing', assistantResponse.threadId);

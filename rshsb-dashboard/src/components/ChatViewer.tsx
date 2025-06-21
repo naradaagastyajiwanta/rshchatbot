@@ -48,7 +48,7 @@ export default function ChatViewer({ waNumber = '' }: { waNumber?: string }) {
         }
         
         console.log('Initial messages loaded:', data?.length || 0);
-        setMessages(data || []);
+        setMessages((data || []).reverse());
         setTimeout(scrollToBottom, 100); // Scroll after messages load
       } catch (err) {
         console.error('Error fetching messages:', err);
