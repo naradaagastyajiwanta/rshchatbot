@@ -14,7 +14,7 @@ const express = require('express');
 const cors = require('cors');
 
 // Import our modules
-const { sendToChatbot } = require('./openai'); // Using updated openai.js with axios implementation
+const { sendToChatbot, cleanAssistantResponse } = require('./openai'); // Using updated openai.js with axios implementation
 const { logChat, getThreadId, getUserProfile } = require('./supabase');
 const { processMessageForInsights } = require('./extractor');
 
@@ -232,11 +232,15 @@ async function connectToWhatsApp() {
         console.log(`Sending message to OpenAI Assistant with thread ID: ${threadId || 'new'} for ${waNumber}`);
         const assistantResponse = await sendToChatbot(messageContent, threadId, waNumber);
         
-        // Send the response back to the user
-        await sock.sendMessage(chatId, { text: assistantResponse.response });
+        // Clean the response to remove citations and excess whitespace
+        const cleanedResponse = cleanAssistantResponse(assistantResponse.response);
+        console.log(`Cleaned response for ${waNumber} (removed citations)`);
         
-        // Log the outgoing message
-        await logChat(waNumber, assistantResponse.response, 'outgoing', assistantResponse.threadId);
+        // Send the cleaned response back to the user
+        await sock.sendMessage(chatId, { text: cleanedResponse });
+        
+        // Log the outgoing message (using cleaned response)
+        await logChat(waNumber, cleanedResponse, 'outgoing', assistantResponse.threadId);
         
         // Process the message for insights in the background
         processMessageForInsights(messageContent, waNumber, assistantResponse.threadId)
@@ -361,12 +365,15 @@ app.post('/api/send-message', verifyApiKey, async (req, res) => {
       return res.status(400).json({ error: 'Invalid message: must be a non-empty string with maximum 1000 characters' });
     }
     
-    // Send the message using the WhatsApp socket
-    await global.whatsappSock.sendMessage(wa_number + '@s.whatsapp.net', { text: message });
+    // Clean the message to remove citations and excess whitespace
+    const cleanedMessage = cleanAssistantResponse(message);
+    
+    // Send the cleaned message using the WhatsApp socket
+    await global.whatsappSock.sendMessage(wa_number + '@s.whatsapp.net', { text: cleanedMessage });
     
     // Log the outgoing message if logChat function is available
     if (typeof logChat === 'function') {
-      await logChat(wa_number, message, 'outgoing', null);
+      await logChat(wa_number, cleanedMessage, 'outgoing', null);
     }
     
     // Return success response

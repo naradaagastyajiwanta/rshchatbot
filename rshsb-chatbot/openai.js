@@ -9,6 +9,20 @@ const axios = require('axios');
 const { pollRunStatus } = require('./openai-utils');
 const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId } = require('./supabase');
 
+/**
+ * Clean Assistant response by removing citation patterns and excess whitespace
+ * @param {string} text - The text response from Assistant to clean
+ * @returns {string} - Cleaned text without citations
+ */
+function cleanAssistantResponse(text) {
+  if (!text) return '';
+  
+  return text
+    .replace(/【\d+:\d+†[^】]+】/g, '') // Remove citation patterns
+    .replace(/\n{2,}/g, '\n')          // Replace multiple newlines with single newline
+    .trim();                           // Remove leading/trailing whitespace
+}
+
 // Constants from environment variables
 const ASSISTANT_ID_CHATBOT = process.env.ASSISTANT_ID_CHATBOT;
 const ASSISTANT_ID_INSIGHT = process.env.ASSISTANT_ID_INSIGHT;
@@ -811,5 +825,6 @@ async function extractInsight(message, threadId = null, waNumber = null) {
 
 module.exports = {
   sendToChatbot,
-  extractInsight
+  extractInsight,
+  cleanAssistantResponse
 };
