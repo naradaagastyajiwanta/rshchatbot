@@ -18,7 +18,7 @@ function cleanAssistantResponse(text) {
 require('dotenv').config();
 const axios = require('axios');
 const { pollRunStatus } = require('./openai-utils');
-const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId, getLastBotMessageFromDB } = require('./supabase');
+const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId, getLastBotMessageBefore } = require('./supabase');
 
 // Constants from environment variables
 const ASSISTANT_ID_CHATBOT = process.env.ASSISTANT_ID_CHATBOT;
@@ -472,17 +472,20 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
  * @returns {Promise<string>} - Combined context string for insight extraction
  */
 async function prepareInsightPayload(waNumber, userMessage) {
-  // Get the last bot message from the database
-  const botMessage = await getLastBotMessageFromDB(waNumber);
+  // Create a timestamp for the current user message
+  const userTimestamp = new Date().toISOString();
+  
+  // Get the last bot message from the database BEFORE this user message timestamp
+  const botMessage = await getLastBotMessageBefore(waNumber, userTimestamp);
   
   // If we have a bot message, combine it with the user message
   if (botMessage) {
-    console.log(`Adding context from last bot message for ${waNumber}`);
+    console.log(`Adding context from last bot message for ${waNumber} (before ${userTimestamp})`);
     return `[Chatbot]: ${botMessage}\n[User]: ${userMessage}`;
   }
   
   // Otherwise, just use the user message
-  console.log(`No previous bot message found for ${waNumber}, using only user message`);
+  console.log(`No previous bot message found for ${waNumber} before ${userTimestamp}, using only user message`);
   return `[User]: ${userMessage}`;
 }
 

@@ -287,6 +287,7 @@ return getOrCreateThreadId(waNumber, 'thread_id_analytic', process.env.ASSISTANT
  * Get the last outgoing message (from bot to user) for a specific WhatsApp number
  * @param {string} waNumber - WhatsApp phone number
  * @returns {Promise<string|null>} - Last bot message or null if not found
+ * @deprecated Use getLastBotMessageBefore instead for more accurate context
  */
 async function getLastBotMessageFromDB(waNumber) {
 try {
@@ -316,6 +317,40 @@ return null;
 }
 }
 
+/**
+ * Get the last outgoing message (from bot to user) BEFORE a certain timestamp
+ * @param {string} waNumber - WhatsApp phone number
+ * @param {string} beforeTimestamp - ISO string (timestamp of user message)
+ * @returns {Promise<string|null>} - Last bot message or null if not found
+ */
+async function getLastBotMessageBefore(waNumber, beforeTimestamp) {
+  try {
+    const { data, error } = await supabase
+      .from('chat_logs')
+      .select('message')
+      .eq('wa_number', waNumber)
+      .eq('direction', 'outgoing')
+      .lt('timestamp', beforeTimestamp)
+      .order('timestamp', { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error('Error fetching last bot message before timestamp:', error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      console.log(`No previous bot messages found for ${waNumber} before ${beforeTimestamp}`);
+      return null;
+    }
+
+    return data[0].message;
+  } catch (err) {
+    console.error('Exception in getLastBotMessageBefore:', err);
+    return null;
+  }
+}
+
 module.exports = {
   supabase,
   logChat,
@@ -325,5 +360,6 @@ module.exports = {
   getOrCreateThreadId,
   getOrCreateChatbotThreadId,
   getOrCreateAnalyticThreadId,
-  getLastBotMessageFromDB
+  getLastBotMessageFromDB, // Kept for backward compatibility
+  getLastBotMessageBefore
 };
