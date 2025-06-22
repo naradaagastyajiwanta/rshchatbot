@@ -436,6 +436,20 @@ app.post('/api/manual-user-input', verifyManualInputApiKey, async (req, res) => 
     // Log the outgoing message
     await logChat(wa_number, assistantResponse.response, 'outgoing', assistantResponse.threadId);
     
+    // Send the cleaned response back to the user via WhatsApp
+    try {
+      if (global.whatsappSock) {
+        console.log(`Sending assistant reply to ${wa_number} via WhatsApp`);
+        await global.whatsappSock.sendMessage(`${wa_number}@s.whatsapp.net`, { text: cleanedResponse });
+        console.log('WhatsApp message sent successfully');
+      } else {
+        console.warn('WhatsApp connection not available, could not send message');
+      }
+    } catch (whatsappError) {
+      console.error('Error sending WhatsApp message:', whatsappError);
+      // Continue execution even if WhatsApp sending fails
+    }
+    
     // Process the message for insights in the background
     processMessageForInsights(message, wa_number, assistantResponse.threadId)
       .then(insights => {
@@ -448,7 +462,7 @@ app.post('/api/manual-user-input', verifyManualInputApiKey, async (req, res) => 
       });
     
     // Return success response with the reply
-    return res.status(200).json({ success: true, reply: cleanedResponse });
+    return res.status(200).json({ success: true, reply: cleanedResponse, whatsappSent: !!global.whatsappSock });
   } catch (error) {
     // Log the error server-side
     console.error('Error processing manual input:', error);
