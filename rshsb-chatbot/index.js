@@ -310,6 +310,28 @@ const verifyApiKey = (req, res, next) => {
   next();
 };
 
+// Middleware to verify manual input API key
+const verifyManualInputApiKey = (req, res, next) => {
+  // Get the authorization header
+  const authHeader = req.headers.authorization;
+  
+  // Check if the API key is provided and in correct format
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid authorization header' });
+  }
+  
+  // Extract the API key
+  const apiKey = authHeader.split(' ')[1];
+  
+  // Verify the API key against the environment variable
+  if (apiKey !== process.env.API_KEY_MANUAL_INPUT) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid API key' });
+  }
+  
+  // If API key is valid, proceed to the next middleware/route handler
+  next();
+};
+
 // API endpoint to force QR code regeneration
 app.post('/api/regenerate-qr', verifyApiKey, async (req, res) => {
   try {
@@ -378,6 +400,59 @@ app.post('/api/send-message', verifyApiKey, async (req, res) => {
     // Log the error server-side but don't expose details to client
     console.error('Error sending WhatsApp message:', error);
     return res.status(500).json({ error: 'Failed to send WhatsApp message' });
+  }
+});
+
+// API endpoint for manual user input to OpenAI
+app.post('/api/manual-user-input', verifyManualInputApiKey, async (req, res) => {
+  try {
+    const { wa_number, message } = req.body;
+    
+    // Validate wa_number (must be string, start with 62, at least 10 digits)
+    if (!wa_number || typeof wa_number !== 'string' || !wa_number.startsWith('62') || wa_number.length < 10) {
+      return res.status(400).json({ error: 'Invalid wa_number: must be a string starting with 62 and at least 10 digits' });
+    }
+    
+    // Validate message (must be string, not empty, max 1000 characters)
+    if (!message || typeof message !== 'string' || message.length === 0 || message.length > 1000) {
+      return res.status(400).json({ error: 'Invalid message: must be a non-empty string with maximum 1000 characters' });
+    }
+    
+    console.log(`Manual input received for ${wa_number}: ${message}`);
+    
+    // Get thread ID for the user
+    const threadId = await getOrCreateChatbotThreadId(wa_number);
+    
+    // Log the incoming message to chat_logs
+    await logChat(wa_number, message, 'incoming', threadId);
+    
+    // Send to OpenAI Assistant and get response
+    console.log(`Sending manual input to OpenAI Assistant with thread ID: ${threadId || 'new'} for ${wa_number}`);
+    const assistantResponse = await sendToChatbot(message, threadId, wa_number);
+    
+    // Clean the response before sending it back
+    const cleanedResponse = cleanAssistantResponse(assistantResponse.response);
+    
+    // Log the outgoing message
+    await logChat(wa_number, assistantResponse.response, 'outgoing', assistantResponse.threadId);
+    
+    // Process the message for insights in the background
+    processMessageForInsights(message, wa_number, assistantResponse.threadId)
+      .then(insights => {
+        if (!insights.error) {
+          console.log(`Insights extracted for ${wa_number}:`, insights);
+        }
+      })
+      .catch(err => {
+        console.error(`Error extracting insights for ${wa_number}:`, err);
+      });
+    
+    // Return success response with the reply
+    return res.status(200).json({ success: true, reply: cleanedResponse });
+  } catch (error) {
+    // Log the error server-side
+    console.error('Error processing manual input:', error);
+    return res.status(500).json({ error: 'Failed to process manual input', message: error.message });
   }
 });
 

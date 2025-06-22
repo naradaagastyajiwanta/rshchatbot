@@ -37,6 +37,8 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
   const [inputMessage, setInputMessage] = useState<string>('');
   const [textareaHeight, setTextareaHeight] = useState<string>('auto');
   const [sendingMessage, setSendingMessage] = useState<boolean>(false);
+  const [manualMessage, setManualMessage] = useState<string>('');
+  const [sendingManualMessage, setSendingManualMessage] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -150,6 +152,61 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
       toast.error(error instanceof Error ? error.message : 'Failed to send message');
     } finally {
       setSendingMessage(false);
+    }
+  };
+  
+  // Handle manual message send to OpenAI
+  const handleManualSend = async () => {
+    const trimmedMessage = manualMessage.trim();
+    
+    // Don't send empty messages
+    if (!trimmedMessage || !waNumber) return;
+    
+    // Validate wa_number
+    if (!waNumber.startsWith('62') || waNumber.length < 10) {
+      toast.error('Invalid WhatsApp number format');
+      return;
+    }
+    
+    setSendingManualMessage(true);
+    
+    try {
+      // Get API URL from env
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      
+      // Send manual message to backend
+      const response = await fetch(`${apiUrl}/api/manual-user-input`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer admin-rsh-secret-1'
+        },
+        body: JSON.stringify({
+          wa_number: waNumber,
+          message: trimmedMessage
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to process manual input');
+      }
+      
+      // Clear input after successful send
+      setManualMessage('');
+      
+      // Show success toast
+      toast.success('Manual message processed successfully');
+      
+      // Scroll to bottom
+      setTimeout(scrollToBottom, 100);
+      
+    } catch (error) {
+      console.error('Error processing manual input:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to process manual input');
+    } finally {
+      setSendingManualMessage(false);
     }
   };
 
@@ -426,6 +483,37 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
             </svg>
           </button>
         </div>
+        
+        {/* Manual input area */}
+        {waNumber && (
+          <div className="flex flex-col sm:flex-row gap-2 mt-4 w-full">
+            <textarea
+              value={manualMessage}
+              onChange={(e) => setManualMessage(e.target.value)}
+              placeholder="Ketik pesan manual untuk bot..."
+              className="w-full p-2 rounded border text-sm"
+              rows={2}
+              disabled={sendingManualMessage}
+            />
+            <button
+              onClick={handleManualSend}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={!manualMessage.trim() || sendingManualMessage}
+            >
+              {sendingManualMessage ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Mengirim...
+                </span>
+              ) : (
+                'Kirim ke Bot'
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
