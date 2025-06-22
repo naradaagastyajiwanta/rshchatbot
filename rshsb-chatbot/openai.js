@@ -12,14 +12,13 @@
 function cleanAssistantResponse(text) {
   return text
     .replace(/【\d+:\d+†[^】]+】/g, '') // Remove citation patterns like 【1:2†...】
-    .replace(/\n{2,}/g, '\n')          // Replace multiple newlines with a single one
     .trim();                           // Remove leading/trailing whitespace
 }
 
 require('dotenv').config();
 const axios = require('axios');
 const { pollRunStatus } = require('./openai-utils');
-const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId } = require('./supabase');
+const { supabase, getUserProfile, getOrCreateChatbotThreadId, getOrCreateAnalyticThreadId, getLastBotMessageFromDB } = require('./supabase');
 
 // Constants from environment variables
 const ASSISTANT_ID_CHATBOT = process.env.ASSISTANT_ID_CHATBOT;
@@ -466,6 +465,27 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
  * @param {string} waNumber - WhatsApp phone number (optional, used to store thread ID)
  * @returns {Object} - Extracted insights as JSON
  */
+/**
+ * Prepare the payload for insight extraction by combining last bot message and user message
+ * @param {string} waNumber - WhatsApp phone number
+ * @param {string} userMessage - User's message to analyze
+ * @returns {Promise<string>} - Combined context string for insight extraction
+ */
+async function prepareInsightPayload(waNumber, userMessage) {
+  // Get the last bot message from the database
+  const botMessage = await getLastBotMessageFromDB(waNumber);
+  
+  // If we have a bot message, combine it with the user message
+  if (botMessage) {
+    console.log(`Adding context from last bot message for ${waNumber}`);
+    return `[Chatbot]: ${botMessage}\n[User]: ${userMessage}`;
+  }
+  
+  // Otherwise, just use the user message
+  console.log(`No previous bot message found for ${waNumber}, using only user message`);
+  return `[User]: ${userMessage}`;
+}
+
 async function extractInsight(message, threadId = null, waNumber = null) {
   const { getOrCreateAnalyticThreadId } = require('./supabase');
   
@@ -590,6 +610,12 @@ async function extractInsight(message, threadId = null, waNumber = null) {
       return null;
     }
 
+    // Prepare the message payload with context if waNumber is provided
+    let messageContent = message;
+    if (waNumber) {
+      messageContent = await prepareInsightPayload(waNumber, message);
+    }
+    
     // Add the message to the thread - with retry logic
     let messageAdded = false;
     let retryAttempts = 0;
@@ -602,7 +628,7 @@ async function extractInsight(message, threadId = null, waNumber = null) {
           `https://api.openai.com/v1/threads/${threadId}/messages`,
           {
             role: 'user',
-            content: message
+            content: messageContent
           },
           { headers }
         );
@@ -824,5 +850,6 @@ async function extractInsight(message, threadId = null, waNumber = null) {
 module.exports = {
   sendToChatbot,
   extractInsight,
-  cleanAssistantResponse
+  cleanAssistantResponse,
+  prepareInsightPayload
 };

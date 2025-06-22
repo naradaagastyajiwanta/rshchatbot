@@ -280,7 +280,40 @@ async function getOrCreateChatbotThreadId(waNumber) {
  * @returns {Promise<string|null>} - Thread ID or null if error
  */
 async function getOrCreateAnalyticThreadId(waNumber) {
-  return getOrCreateThreadId(waNumber, 'thread_id_analytic', process.env.ASSISTANT_ID_INSIGHT);
+return getOrCreateThreadId(waNumber, 'thread_id_analytic', process.env.ASSISTANT_ID_INSIGHT);
+}
+
+/**
+ * Get the last outgoing message (from bot to user) for a specific WhatsApp number
+ * @param {string} waNumber - WhatsApp phone number
+ * @returns {Promise<string|null>} - Last bot message or null if not found
+ */
+async function getLastBotMessageFromDB(waNumber) {
+try {
+const { data, error } = await supabase
+  .from('chat_logs')
+  .select('message')
+  .eq('wa_number', waNumber)
+  .eq('direction', 'outgoing')
+  .order('timestamp', { ascending: false })
+  .limit(1);
+
+if (error) {
+  console.error('Error fetching last bot message:', error);
+  return null;
+}
+
+if (!data || data.length === 0) {
+  console.log(`No previous bot messages found for ${waNumber}`);
+  return null;
+}
+
+console.log(`Found last bot message for ${waNumber}`);
+return data[0].message;
+} catch (err) {
+console.error('Exception fetching last bot message:', err);
+return null;
+}
 }
 
 module.exports = {
@@ -289,8 +322,8 @@ module.exports = {
   getThreadId, // Kept for backward compatibility
   updateUserProfile,
   getUserProfile,
-  checkDatabaseConnection,
+  getOrCreateThreadId,
   getOrCreateChatbotThreadId,
   getOrCreateAnalyticThreadId,
-  getOrCreateThreadId // Export the generic helper for advanced use cases
+  getLastBotMessageFromDB
 };
