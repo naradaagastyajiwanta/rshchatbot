@@ -469,11 +469,15 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
  * Prepare the payload for insight extraction by combining last bot message and user message
  * @param {string} waNumber - WhatsApp phone number
  * @param {string} userMessage - User's message to analyze
+ * @param {string} userTimestamp - ISO timestamp of when the user message was received
  * @returns {Promise<string>} - Combined context string for insight extraction
  */
-async function prepareInsightPayload(waNumber, userMessage) {
-  // Create a timestamp for the current user message
-  const userTimestamp = new Date().toISOString();
+async function prepareInsightPayload(waNumber, userMessage, userTimestamp) {
+  // If no timestamp provided, use a fallback but log a warning
+  if (!userTimestamp) {
+    console.warn(`WARNING: No userTimestamp provided for ${waNumber}, using current time as fallback. This may cause incorrect context.`);
+    userTimestamp = new Date().toISOString();
+  }
   
   // Get the last bot message from the database BEFORE this user message timestamp
   const botMessage = await getLastBotMessageBefore(waNumber, userTimestamp);
@@ -489,7 +493,15 @@ async function prepareInsightPayload(waNumber, userMessage) {
   return `[User]: ${userMessage}`;
 }
 
-async function extractInsight(message, threadId = null, waNumber = null) {
+/**
+ * Extract insights from a message using the insight extractor assistant
+ * @param {string} message - Message to extract insights from
+ * @param {string} threadId - Optional thread ID for continuing conversations
+ * @param {string} waNumber - WhatsApp phone number (optional, used to store thread ID)
+ * @param {string} userTimestamp - ISO timestamp of when the user message was received
+ * @returns {Object} - Extracted insights as JSON
+ */
+async function extractInsight(message, threadId = null, waNumber = null, userTimestamp = null) {
   const { getOrCreateAnalyticThreadId } = require('./supabase');
   
   try {
@@ -616,7 +628,7 @@ async function extractInsight(message, threadId = null, waNumber = null) {
     // Prepare the message payload with context if waNumber is provided
     let messageContent = message;
     if (waNumber) {
-      messageContent = await prepareInsightPayload(waNumber, message);
+      messageContent = await prepareInsightPayload(waNumber, message, userTimestamp);
     }
     
     // Add the message to the thread - with retry logic

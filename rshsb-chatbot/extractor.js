@@ -12,14 +12,15 @@ const { notifyCSIfNeeded } = require('./notifier');
  * @param {string} message - The message to extract insights from
  * @param {string} waNumber - The WhatsApp number of the user
  * @param {string} threadId - Optional thread ID for continuing conversations
+ * @param {string} userTimestamp - ISO timestamp of when the user message was received
  * @returns {Object} - The extracted insights
  */
-async function processMessageForInsights(message, waNumber, threadId = null) {
+async function processMessageForInsights(message, waNumber, threadId = null, userTimestamp = null) {
   try {
-    console.log(`Extracting insights from message for ${waNumber}...`);
+    console.log(`Extracting insights from message for ${waNumber}${userTimestamp ? ` (timestamp: ${userTimestamp})` : ''}...`);
     
-    // Extract insights from the message, passing waNumber to store thread ID
-    const insights = await extractInsight(message, threadId, waNumber);
+    // Extract insights from the message, passing waNumber and userTimestamp
+    const insights = await extractInsight(message, threadId, waNumber, userTimestamp);
     
     // If we got any insights, update the user profile
     if (insights && !insights.error) {

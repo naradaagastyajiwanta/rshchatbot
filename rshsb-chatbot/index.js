@@ -215,6 +215,9 @@ async function connectToWhatsApp() {
         // Format the phone number (remove WhatsApp suffix)
         const waNumber = chatId.split('@')[0];
         
+        // Create a timestamp for the user message
+        const userTimestamp = new Date().toISOString();
+        
         // Log the incoming message
         const threadId = await getThreadId(waNumber);
         await logChat(waNumber, messageContent, 'incoming', threadId);
@@ -242,7 +245,8 @@ async function connectToWhatsApp() {
         await logChat(waNumber, assistantResponse.response, 'outgoing', assistantResponse.threadId);
         
         // Process the message for insights in the background
-        processMessageForInsights(messageContent, waNumber, assistantResponse.threadId)
+        // Pass the original user message timestamp to ensure we get the correct context
+        processMessageForInsights(messageContent, waNumber, assistantResponse.threadId, userTimestamp)
           .then(insights => {
             if (!insights.error) {
               console.log(`Insights extracted for ${waNumber}:`, insights);
