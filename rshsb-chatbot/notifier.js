@@ -104,9 +104,9 @@ async function notifyCSIfNeeded(userProfile, sock) {
       return false;
     }
     
-    // Skip if not a high lead
-    if (userProfile.lead_status !== 'high') {
-      console.log(`User ${userProfile.wa_number} is not a high lead, skipping notification`);
+    // Skip if not a high or very_high lead
+    if (userProfile.lead_status !== 'high' && userProfile.lead_status !== 'very_high') {
+      console.log(`User ${userProfile.wa_number} is not a high or very_high lead, skipping notification`);
       return false;
     }
     
