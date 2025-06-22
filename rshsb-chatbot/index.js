@@ -421,7 +421,7 @@ app.post('/api/manual-user-input', verifyManualInputApiKey, async (req, res) => 
     console.log(`Manual input received for ${wa_number}: ${message}`);
     
     // Get thread ID for the user
-    const threadId = await getOrCreateChatbotThreadId(wa_number);
+    const threadId = await getThreadId(wa_number);
     
     // Log the incoming message to chat_logs
     await logChat(wa_number, message, 'incoming', threadId);
