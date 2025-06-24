@@ -463,7 +463,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
           <div className="flex-1 min-h-[40px] rounded-lg border border-gray-300 overflow-hidden focus-within:border-pink-500 focus-within:ring-1 focus-within:ring-pink-500">
             <textarea
               ref={textareaRef}
-              className="w-full px-3 py-2 outline-none resize-none min-h-[40px] max-h-[120px]"
+              className="w-full px-3 py-2 outline-none resize-none min-h-[40px] max-h-[120px] text-black"
               placeholder="Type a message..."
               rows={1}
               value={inputMessage}
@@ -491,7 +491,7 @@ export default function ChatWindow({ waNumber }: ChatWindowProps) {
               value={manualMessage}
               onChange={(e) => setManualMessage(e.target.value)}
               placeholder="Ketik pesan manual untuk bot..."
-              className="w-full p-2 rounded border text-sm"
+              className="w-full p-2 rounded border text-sm text-black"
               rows={2}
               disabled={sendingManualMessage}
             />
