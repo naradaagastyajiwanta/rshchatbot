@@ -157,7 +157,7 @@ export default function ChatViewerMobile() {
   // User list view (shown by default or when back button is pressed)
   return (
     <div className="flex h-full bg-white rounded-lg shadow overflow-hidden">
-      <div className="w-full">
+      <div className="w-full h-full overflow-y-auto">
         <UserSidebar 
           users={users} 
           selectedUser={selectedUser} 
