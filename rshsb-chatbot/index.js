@@ -292,6 +292,33 @@ app.get('/ping', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// API endpoint to export chat history
+app.get('/api/export-chat', async (req, res) => {
+  const { wa_number, type } = req.query;
+  if (!wa_number || !['pdf', 'txt'].includes(type)) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  const { getChatHistoryFormatted, generateTxtFile, generatePdfFile } = require('./exportUtils');
+  const chatText = await getChatHistoryFormatted(wa_number);
+
+  if (!chatText) {
+    return res.status(404).json({ error: 'Chat not found' });
+  }
+
+  if (type === 'txt') {
+    const txtBuffer = generateTxtFile(chatText);
+    res.setHeader('Content-Disposition', `attachment; filename="chat-${wa_number}.txt"`);
+    res.setHeader('Content-Type', 'text/plain');
+    return res.send(txtBuffer);
+  } else {
+    const pdfBuffer = await generatePdfFile(chatText);
+    res.setHeader('Content-Disposition', `attachment; filename="chat-${wa_number}.pdf"`);
+    res.setHeader('Content-Type', 'application/pdf');
+    return res.send(pdfBuffer);
+  }
+});
+
 // Middleware to verify API key
 const verifyApiKey = (req, res, next) => {
   // Get the authorization header

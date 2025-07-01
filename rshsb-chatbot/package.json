@@ -23,11 +23,15 @@
     "@supabase/supabase-js": "^2.50.0",
     "@whiskeysockets/baileys": "^6.7.18",
     "axios": "^1.10.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "openai": "^5.5.1",
+    "pdfkit": "^0.17.1",
     "qrcode": "^1.5.4",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "dotenv": "^16.5.0",

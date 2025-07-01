@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import ChatViewer from './ChatViewer';
 import Link from 'next/link';
 import ResetThreadButton from './ResetThreadButton';
+import { Button } from './ui/button';
 
 interface UserProfile {
   wa_number: string;
@@ -173,6 +174,38 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
       setToastMessage("Failed to update bot status");
       setShowToast(true);
       
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+    }
+  };
+  
+  // Function to download chat history as HTML or TXT
+  const downloadChat = async (type: 'pdf' | 'txt' | 'html') => {
+    try {
+      setToastMessage(`Downloading chat as ${type.toUpperCase()}...`);
+      setShowToast(true);
+      
+      const res = await fetch(`/api/export-chat?wa_number=${waNumber}&type=${type}`);
+      
+      if (!res.ok) {
+        throw new Error(`Failed to download chat: ${res.statusText}`);
+      }
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `chat-${waNumber}.${type}`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      setToastMessage(`Chat exported as ${type.toUpperCase()} successfully`);
+    } catch (err) {
+      console.error('Error downloading chat:', err);
+      setToastMessage(`Failed to download chat as ${type.toUpperCase()}`);
+    } finally {
+      // Hide toast after 3 seconds
       setTimeout(() => {
         setShowToast(false);
       }, 3000);
@@ -365,9 +398,25 @@ export default function UserDetail({ waNumber }: { waNumber: string }) {
         <div className="bg-white p-6 rounded-xl shadow-lg border border-[#e6c0cf] h-full hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-[#8e003b]">Chat History</h3>
-            <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
-              Conversation
-            </span>
+            <div className="flex items-center space-x-2">
+              <Button 
+                onClick={() => downloadChat('html')} 
+                className="bg-[#8e003b] hover:bg-[#5e0027] text-white text-xs py-1 px-3 rounded-md"
+                size="sm"
+              >
+                Download HTML
+              </Button>
+              <Button 
+                onClick={() => downloadChat('txt')} 
+                className="bg-gray-600 hover:bg-gray-700 text-white text-xs py-1 px-3 rounded-md"
+                size="sm"
+              >
+                Download TXT
+              </Button>
+              <span className="text-xs text-[#8e003b] bg-[#f5e0e8] px-3 py-1 rounded-full font-medium">
+                Conversation
+              </span>
+            </div>
           </div>
           <ChatViewer waNumber={waNumber} />
         </div>
