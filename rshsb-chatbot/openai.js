@@ -420,8 +420,38 @@ async function sendToChatbot(message, threadId = null, waNumber = null) {
       throw new Error('No assistant response found');
     }
     
-    // Get the content of the latest message
-    const responseContent = assistantMessages[0].content[0].text.value;
+    // Get the content of the latest message with proper error handling
+    let responseContent = 'Sorry, I could not process your message properly.';
+    
+    try {
+      // Check if content exists and has the expected structure
+      if (assistantMessages[0].content && 
+          assistantMessages[0].content.length > 0 && 
+          assistantMessages[0].content[0].text) {
+        responseContent = assistantMessages[0].content[0].text.value;
+      } else {
+        console.log('Unexpected message format:', JSON.stringify(assistantMessages[0]));
+        
+        // Try to extract content in a different way if possible
+        if (assistantMessages[0].content) {
+          // Log the content structure to help debug
+          console.log('Content structure:', JSON.stringify(assistantMessages[0].content));
+          
+          // Try to handle different content types
+          const firstContent = assistantMessages[0].content[0];
+          if (firstContent) {
+            if (firstContent.type === 'text') {
+              responseContent = firstContent.text.value;
+            } else {
+              // Handle other content types if needed
+              responseContent = `[Received a message of type: ${firstContent.type}]`;
+            }
+          }
+        }
+      }
+    } catch (contentError) {
+      console.error('Error extracting message content:', contentError);
+    }
     
     return {
       response: responseContent,
